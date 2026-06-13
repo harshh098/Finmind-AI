@@ -1,0 +1,200 @@
+Q: What is KYC policy?
+A: Mandatory identity, address, and risk verification to open and maintain accounts.
+Q: What documents are valid for KYC?
+A: Officially Valid Documents like Aadhaar (consent-based), PAN, passport, voter ID, driving licence.
+Q: What is re-KYC?
+A: Periodic KYC updates based on risk category or when profile details change.
+Q: What is CKYC?
+A: Central KYC registry that enables KYC portability across financial institutions.
+Q: Is Video KYC allowed?
+A: Yes, live video identification with liveness and geo-tagging is permitted under RBI norms.
+Q: Is Aadhaar mandatory for bank accounts?
+A: No, it is voluntary and consent-based; alternative OVDs can be used.
+Q: Is PAN mandatory?
+A: PAN or Form 60 is required for specified accounts and transactions.
+Q: What is customer risk categorization?
+A: Classification into low/medium/high risk that drives KYC frequency and monitoring.
+Q: What is a small account?
+A: Simplified due diligence account with usage limits and close monitoring.
+Q: What is AML/CFT monitoring?
+A: Ongoing screening and suspicious transaction reporting to prevent financial crimes.
+Q: What is data minimization policy?
+A: Collect only necessary data, use per consented purpose, and retain per regulation.
+Q: Can customers see what data is stored?
+A: Yes, customers can request disclosures per bank privacy policy and applicable laws.
+Q: What is the schedule of charges?
+A: Published list of bank fees; changes require prior notice.
+Q: Are minimum balances mandated?
+A: Banks set product-wise minimum balances; BSBD accounts are zero-balance.
+Q: What is a BSBD account?
+A: Basic Savings Bank Deposit account with essential services and zero-balance facility.
+Q: Can banks change fees mid-year?
+A: Yes, with advance public disclosure and notices to customers.
+Q: What is account dormancy?
+A: No customer-initiated transactions for 2 years; reactivation may require re-KYC.
+Q: What is nomination policy?
+A: Customers can nominate beneficiaries; updates and multiple nominations may be allowed.
+Q: What happens if no nomination exists?
+A: Legal heirs must provide documents for claim settlement as per bank policy.
+Q: Are statements mandatory?
+A: Yes, periodic statements must be provided via digital or physical modes.
+Q: What is locker policy?
+A: Locker agreements define rights/liabilities; banks follow updated locker directions.
+Q: Are locker contents insured by the bank?
+A: Generally no; liability is limited as per agreement and regulations.
+Q: What is cheque truncation policy?
+A: CTS enables image-based clearing; physical cheques arent moved across banks.
+Q: How to stop a cheque?
+A: Place a stop-payment request before clearing via app/net banking/branch.
+Q: Are ATM transactions free?
+A: Limited free transactions apply; charges beyond those per schedule of charges.
+Q: What is grievance redressal policy?
+A: Banks publish TATs and escalation paths; unresolved issues go to Ombudsman.
+Q: What is customer liability in unauthorized transactions?
+A: Limited liability based on prompt reporting and absence of customer negligence.
+Q: What is 2FA policy?
+A: Two-factor authentication is mandatory for digital transactions, with flexible factors.
+Q: What is tokenization policy?
+A: Merchants cannot store PAN; tokenized credentials must be used for CNP transactions.
+Q: What is device binding policy?
+A: Banking/UPI apps bind to a registered device/SIM; re-binding is needed on device/SIM change.
+Q: What are card control policies?
+A: Customers can enable/disable channels, set international usage, and set spend limits.
+Q: What is step-up authentication?
+A: Extra verification triggered for high-risk transactions.
+Q: Are PPIs regulated?
+A: Yes, wallets/cards have KYC tiers, balances, and load limits under RBI rules.
+Q: What is PA/PG policy?
+A: Payment Aggregators/Gateways require authorization, escrow, governance, and security controls.
+Q: What is merchant KYC policy?
+A: Mandatory KYC and risk checks for onboarding and monitoring merchants.
+Q: What is escrow settlement policy?
+A: Merchant settlements must flow from regulated escrow within disclosed timelines.
+Q: What is UPI policy on charges?
+A: Consumers typically pay zero; any MDR is merchant-borne unless category-specific rules apply.
+Q: What is UPI dispute policy?
+A: Raise in-app complaints; typical resolution is T+1/T+2 and auto-reveals on failures.
+Q: What is UPI Lite policy?
+A: Small-value PIN-less debits under defined per-transaction and daily caps; top-ups via regular UPI.
+Q: What is NEFT policy?
+A: Operates 247 in half-hourly batches; banks disclose charges and cutoffs for assisted channels.
+Q: What is RTGS policy?
+A: Real-time settlement 247 for high-value transfers; thresholds per bank policy.
+Q: What is IMPS policy?
+A: Instant transfer service across banks, channels, and times; limits per bank.
+Q: What is eNACH/mandate policy?
+A: Create, pause, modify, or cancel mandates with authentication and audit trails.
+Q: What is cooling period policy?
+A: Temporary restriction after adding beneficiaries/devices for fraud mitigation.
+Q: What is add-payee policy?
+A: New beneficiaries may have lower limits for a set period before full limits apply.
+Q: What is OTP confidentiality policy?
+A: Banks never ask for OTP/PIN/CVV; sharing is customer negligence.
+Q: What is SIM-swap risk policy?
+A: Banks advise SIM locks/alerts; suspicious SIM changes may trigger additional checks.
+Q: What is phishing response policy?
+A: Do not click links; report to bank; banks disseminate advisories and block compromised channels.
+Q: What is lost phone policy?
+A: Revoke app access/tokens, re-bind on new device, and inform bank to block channels if needed.
+Q: What is statement retention policy?
+A: Banks retain and provide statements per regulatory timelines for audit and customer access.
+Q: What is privacy notice requirement?
+A: Banks must publish privacy policies covering collection, use, sharing, and retention.
+Q: What is consent management policy?
+A: Explicit, granular consent for data use, mandates, and account aggregation; revocable by customer.
+Q: What is AA consent artifact policy?
+A: Consent artifacts must be stored and retrievable for audits and dispute resolution.
+Q: What is marketing consent/DND policy?
+A: Communications must honor consent preferences and Do Not Disturb requests.
+Q: What is account closure policy?
+A: Customers can close accounts after dues clearance; banks process within defined TAT.
+Q: What is lien marking policy?
+A: Banks may mark lien on deposits for loans/mandates, disclosed in terms.
+Q: What is overdraft policy?
+A: OD limits, renewals, and pricing are disclosed; interest applies on utilized amounts.
+Q: What is FD premature closure policy?
+A: Allowed for callable FDs with penalties; non-callable FDs generally cannot be broken.
+Q: What is FD auto-renewal policy?
+A: On opting, FD renews at prevailing rate; otherwise credited to account per instruction.
+Q: What is deposit insurance policy?
+A: DICGC covers up to ?5 lakh per depositor per bank for eligible deposits.
+Q: What is branchless banking/BC policy?
+A: Banking correspondents operate under defined roles, KYC, and transaction limits.
+Q: What is cash handling policy?
+A: Cash deposits/withdrawals above thresholds may require enhanced checks and reporting.
+Q: What is FATCA/CRS policy?
+A: Declaration and reporting requirements exist for tax residency compliance.
+Q: What is grievance escalation policy?
+A: Move from customer care to nodal officer; if unresolved, approach Ombudsman.
+Q: What is fair practices code?
+A: Public code outlining transparent pricing, disclosures, and customer rights.
+Q: What is KFS policy for loans?
+A: Provide Key Facts Statement showing APR, fees, reset, and penal charges before signing.
+Q: What is prepayment/foreclosure policy?
+A: No charges on specified floating-rate retail loans; others per contract with disclosure.
+Q: What is penal charge policy?
+A: Penal charges allowed on defaults; compounding penal interest is prohibited.
+Q: What is benchmark reset policy?
+A: Disclose benchmark, spread, reset frequency, and customer options to switch.
+Q: What is loan document access policy?
+A: Provide copies of agreements, sanction letters, and amortization schedules on request.
+Q: What is collateral return policy?
+A: Release collateral and documents promptly post-closure, within defined TAT.
+Q: What is recovery conduct policy?
+A: Prohibits harassment; requires trained staff and adherence to fair practices.
+Q: What is restructuring policy?
+A: Permits modifications under defined schemes with disclosures of impact and costs.
+Q: What is settlement/OTS policy?
+A: Allowed under guidelines; may impact credit history; terms are documented.
+Q: What is NPA classification policy?
+A: Classify overdue accounts per 90+ DPD norm and other prudential rules.
+Q: What is SARFAESI enforcement policy?
+A: Issue statutory notices before possession/auction of secured assets.
+Q: What is consumer duty policy?
+A: Provide clear, fair disclosures and products suitable for customer needs.
+Q: What is mis-selling prevention policy?
+A: Prohibits misleading claims; requires suitability assessments and audit trails.
+Q: What is insurance bundling policy?
+A: Credit insurance is optional, consent-based, and separately disclosed.
+Q: What is project finance policy?
+A: Harmonised norms for appraisal, DSCR, COD shifts, and risk management.
+Q: What is digital lending policy?
+A: Regulates LSPs, data use, consent, disclosures, and repayment channels.
+Q: What is merchant acquisition policy?
+A: PA/PA P onboarding requires KYC, MCC risk scoring, and escrow settlement.
+Q: What is dynamic QR policy?
+A: Dynamic QR must carry amount/order details and merchant identity.
+Q: What is card data storage policy?
+A: Merchants must not store PAN/CVV; use tokens and comply with PCI DSS.
+Q: What is authentication factor independence policy?
+A: 2FA factors must be from different categories (knowledge/possession/inherence).
+Q: What is offline small-value payment policy?
+A: Permitted under caps with deferred authentication and reconciliation.
+Q: What is refund timeline policy?
+A: Timelines differ by rail; UPI failures typically auto-revee within 2448 hours.
+Q: What is downtime communication policy?
+A: Banks/PSPs must provide clear error messages and guidance during outages.
+Q: What is accessibility policy?
+A: Provide multilingual support and accessible interfaces for inclusive banking.
+Q: What is cybeecurity incident policy?
+A: Maintain monitoring, reporting, and remediation processes for security incidents.
+Q: What is customer education policy?
+A: Regular advisories on fraud, safe banking, and digital hygiene.
+Q: What is record retention policy?
+A: Retain KYC, transactions, and consent logs per regulatory timelines.
+Q: What is audit trail policy?
+A: Maintain immutable logs for KYC, consent, transactions, and mandates.
+Q: What is staff access control policy?
+A: Role-based access, least privilege, and monitoring for internal risk.
+Q: What is vendor management policy?
+A: Due diligence, contracts, security, and performance monitoring for third parties.
+Q: What is change management policy?
+A: Formal approvals, testing, and rollback plans for IT and product changes.
+Q: What is rate change notification policy?
+A: Notify customers of changes in benchmark or spread as per agreed timelines.
+Q: What is fee change notification policy?
+A: Give advance notice and updated schedules for any fee revisions.
+Q: What is Ombudsman escalation policy?
+A: After bank TAT lapses or unsatisfactory resolution, escalate with evidence to Ombudsman.
+Q: What is compliance attestation policy?
+A: Periodic internal/external audits and certifications to ensure policy adherence.

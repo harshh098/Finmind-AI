@@ -1,0 +1,200 @@
+Q: What is a savings account?
+A: A savings account is a deposit account for individuals that earns interest and supports everyday payments and withdrawals.
+Q: What is a current account?
+A: A current account is a high transaction account for businesses with cheque/online facilities and typically low or no interest.
+Q: What is a salary account?
+A: A salary account is a zero balance variant opened by an employer for monthly credit of salary with regular savings features.
+Q: What is a fixed deposit (FD) account?
+A: An FD is a time deposit with a fixed tenure and interest rate, usually higher than savings accounts.
+Q: What is a recurring deposit (RD) account?
+A: An RD lets you deposit a fixed amount monthly for a chosen tenure to earn fixed interest.
+Q: What is an NRE account?
+A: Non Resident External account for NRIs to hold foreign income in INR; fully repatriable and interest is tax free in India.
+Q: What is an NRO account?
+A: Non Resident Ordinary account to manage income earned in India; interest is taxable and repatriation is limited.
+Q: What is an FCNR account?
+A: Foreign Currency Non Resident term deposit in foreign currency, shielding against INR currency risk; interest tax free in India.
+Q: What is a Demat account?
+A: A Demat holds securities like shares and bonds in electronic form for trading and investments.
+Q: What is a BSBD/BSBDA account?
+A: Basic Savings Bank Deposit Account offering zero balance essential banking features to promote inclusion.
+Q: What is account opening KYC?
+A: Know Your Customer checks: identity, address, PAN/Form 60, and photograph; eKYC/Video KYC may be available.
+Q: Can I open a bank account online?
+A: Yes, many banks support instant digital or video KYC savings accounts.
+Q: What is minimum balance?
+A: The bank defined minimum average balance for standard accounts; BSBD remains zero balance.
+Q: What interest do savings accounts pay?
+A: Bank set rates, often tiered by balance; check your banks live schedule for exact rates.
+Q: How often is savings interest credited?
+A: Typically quarterly or monthly as per bank policy; details are disclosed by each bank.
+Q: What is account number vs customer ID?
+A: Account number identifies a specific account; customer ID maps all relationships under one profile.
+Q: What documents are needed for savings account opening?
+A: Valid ID, address proof, PAN/Form 60, and photo; minor/senior variants may add specifics.
+Q: Can students and minors open accounts?
+A: Yes, minors can open with guardian consent or limited KYC; student friendly variants exist.
+Q: What is joint account operation?
+A: Joint accounts define operation instructions like either or survivor for flexibility and survivohip.
+Q: What is a nominee in bank accounts?
+A: A nominee is a peon designated to receive funds upon the account holders death.
+Q: How do I add or change a nominee?
+A: Submit a nomination form via branch or supported digital channels; keep details updated.
+Q: What is account dormancy?
+A: If no customer initiated transactions occur for 2 years, the account becomes dormant until reactivation steps are completed.
+Q: How to reactivate a dormant account?
+A: Complete re KYC and perform a customer initiated transaction per bank process.
+Q: What is re KYC?
+A: Periodic KYC updates based on risk category or profile changes to keep records current.
+Q: Can I hold multiple savings accounts?
+A: Yes, you can maintain multiple accounts across banks as per your needs.
+Q: What is a family or bundled account?
+A: Some banks offer linked family accounts or groups with consolidated benefits and fees.
+Q: What is a womens/senior citizens savings account?
+A: Segment specific variants offering tailored benefits like fee waivers or higher interest.
+Q: What is a digital/insta savings account?
+A: Fully online, quick onboarding accounts, often with eKYC and app fit servicing.
+Q: What is a premium banking relationship?
+A: Higher tier accounts offering concierge benefits, fee waivers, and relationship managers.
+Q: What is a cheque book facility?
+A: A booklet of cheques for payments; issuance depends on account type and request.
+Q: What is CTS?
+A: Cheque Truncation System that clears cheques from images for faster processing.
+Q: What is passbook vs e statement?
+A: Passbook is a physical transaction record; e statements are digital PDFs sent periodically.
+Q: How do I download statements?
+A: Use net banking or the mobile app to download PDF/CSV statements.
+Q: What is a debit card?
+A: A payment card linked to your account for ATM withdrawals, PoS, and e commerce transactions.
+Q: How do I set card limits and controls?
+A: Use the bank app to set domestic/international, contactless, online, and ATM usage limits.
+Q: What is tokenization for cards?
+A: Replacing the card number with a token for safer online transactions and storage.
+Q: What is 2FA in banking apps?
+A: Two factor authentication like OTP plus device/biometric for secure access and payments.
+Q: How to update mobile number or email?
+A: Use app/online flow or visit the branch with ID verification as required.
+Q: Can I link UPI to my savings account?
+A: Yes, you can link multiple bank accounts to UPI apps for instant payments.
+Q: What is device binding?
+A: Associating your specific phone/SIM with the bank/UPI app to prevent unauthorized access.
+Q: What is a sweep account/sweep in FD?
+A: Surplus savings balances auto move to FD and sweep back to maintain liquidity.
+Q: What is account portability?
+A: You can close and reopen at another bank; full portability across banks isnt mandated.
+Q: What is lien marking on deposits?
+A: A hold placed on your FD/amounts as security for loans or mandates.
+Q: What is an overdraft (OD) against account?
+A: A sanctioned limit allowing negative balances with interest charged on usage.
+Q: What is an OD against FD?
+A: Borrowing against FD at a spread over the FD rate without breaking the deposit.
+Q: What is average monthly balance (AMB)?
+A: The required average balance across the month to avoid non maintenance charges.
+Q: What happens if I dont maintain AMB?
+A: Banks may levy non maintenance charges as per the schedule.
+Q: What is a zero balance savings account?
+A: Accounts with no minimum balance requirement, like BSBD or salary accounts.
+Q: What are account service charges?
+A: Published fees for services beyond free limits; banks must disclose and update publicly.
+Q: What is a locker account/relationship?
+A: Agreement based safe deposit locker facility with defined responsibilities and charges.
+Q: Can NRIs open savings accounts?
+A: NRIs open NRE/NRO savings; resident savings accounts must be converted upon status change.
+Q: What is repatriation for NRE/NRO?
+A: NRE is fully repatriable; NRO repatriation is limited and subject to tax/documentation.
+Q: What is RFC account?
+A: Resident Foreign Currency account for returning NRIs to hold foreign currency balances.
+Q: Can I have both NRE and NRO accounts?
+A: Yes; use NRE for foreign income and NRO for Indian income flows.
+Q: What is an account aggregator consent?
+A: Your authorization to share account data securely with a licensed AA for specific purposes.
+Q: Can I export transactions for taxes?
+A: Yes, download CSV/PDF statements for reconciliation and filings.
+Q: What is a service request?
+A: Any account change instruction like address update, cheque book, or card reissue via app/branch.
+Q: What is address proof update?
+A: Submitting valid OVDs or accepted documents to change your address in bank records.
+Q: What is identity proof update?
+A: Providing updated ID documents when they expire or details change.
+Q: What is PAN seeding?
+A: Linking PAN to your account for compliance and TDS reporting.
+Q: What is Aadhaar seeding?
+A: Linking Aadhaar for KYC or subsidy benefits where applicable and with consent.
+Q: How to enable e statements?
+A: Opt in through app/net banking to receive periodic statements by email.
+Q: What are account alerts?
+A: SMS/app/email notifications for transactions, logins, and security events.
+Q: How to secure my account?
+A: Use strong passwords, enable biometrics/2FA, review app permissions, and avoid public Wi Fi.
+Q: What is a transaction limit?
+A: Per transaction and daily limits you can set for transfers and card usage.
+Q: How to add a beneficiary?
+A: Add via app/net banking; a cooling period may apply before large transfers.
+Q: What is a scheduled transfer?
+A: A future dated or recurring payment set in app/net banking for bills and savings.
+Q: What is e mandate?
+A: Digital authorization for recurring debits (EMIs/bills) via NACH/UPI with consent.
+Q: What is account freezing?
+A: Temporary restrictions due to KYC issues, suspicious activity, or regulatory orders until resolved.
+Q: How to close my account?
+A: Place a closure request, settle dues, and provide instructions for remaining balance payout.
+Q: What is survivohip in joint accounts?
+A: The surviving holder can operate or claim funds based on mandate after the others demise.
+Q: What is a mandate holder?
+A: A third party authorized to operate an account within specified limits by the account holder.
+Q: What is standing instruction (SI)?
+A: Automated periodic transfers between your accounts or billers.
+Q: What is cheque return?
+A: A cheque is returned unpaid due to reasons like insufficient funds or signature mismatch.
+Q: What is stop payment?
+A: An instruction to prevent payment of a cheque before it is cleared.
+Q: What is account number masking?
+A: Displaying only partial digits in communications to protect privacy.
+Q: What is e KYC vs Video KYC?
+A: e KYC uses Aadhaar OTP/XML; Video KYC is a live interaction with liveness and geo checks.
+Q: Can I convert a savings account to NRO on becoming NRI?
+A: Yes, resident accounts must be redesignated to NRO/NRE per status change.
+Q: What is a family nomination split?
+A: Some banks allow multiple nominees with assigned share ratios.
+Q: What happens on account holders demise?
+A: Funds are released to nominee/survivor or legal heir per due process and documents.
+Q: What is cheque truncation image quality?
+A: Cheques must meet image standards (MICR clarity) for CTS processing.
+Q: What are inward vs outward cheques?
+A: Inward are cheques deposited to your account; outward are cheques you issue to others.
+Q: What is an instant virtual debit card?
+A: A card number issued instantly in app for online transactions pending physical card delivery.
+Q: Can I disable online or contactless payments?
+A: Yes, toggle channels in card controls for security.
+Q: What is an account package/plan?
+A: Bundled benefits and fee structure under a specific account plan (e.g., premium, student).
+Q: What is a salary account conveion?
+A: If salary credits stop, banks may convert to a regular savings variant with applicable AMB.
+Q: What is a bank identifier code on statements?
+A: Codes like IFSC and branch details used for transfers and reconciliation.
+Q: How are service charges notified?
+A: Banks update websites/apps and may notify customers prior to changes.
+Q: What is an account relationship number?
+A: A unique ID for your overall relationship used in service and support.
+Q: What is cheque book reissue?
+A: Requesting new cheques upon exhaustion/loss; charges may apply as per schedule.
+Q: What is an e receipt?
+A: A digital confirmation of transactions, often with reference/UTR for proof.
+Q: How to verify a payee before transfer?
+A: Use name preview/confirmations in NEFT/IMPS/UPI and verify details carefully.
+Q: What if I sent money to a wrong account?
+A: Recovery isnt guaranteed; immediately inform bank and recipient bank to attempt recall.
+Q: What is account hygiene?
+A: Regularly reviewing transactions, updating KYC, and pruning unused channels/mandates.
+Q: What is branchless banking?
+A: Banking through BCs and digital channels without visiting branches.
+Q: What is a relationship manager (RM)?
+A: A dedicated advisor provided to premium/priority customers for service and products.
+Q: Can I open FD/RD from my savings account online?
+A: Yes, most banks allow instant FD/RD booking and linkage from savings.
+Q: What is statement cycle preference?
+A: Selecting monthly/quarterly e statement frequency or on demand download.
+Q: How to raise grievances?
+A: Use in app/branch channels; escalate unresolved issues to the Ombudsman.
+Q: Whats the safest way to operate accounts?
+A: Use official apps, enable 2FA and alerts, set transaction/card limits, and verify beneficiaries each time.

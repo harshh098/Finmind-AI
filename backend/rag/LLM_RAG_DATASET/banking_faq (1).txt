@@ -1,0 +1,200 @@
+Q: What is NEFT?
+A: NEFT is a nationwide electronic funds transfer system that settles payments in half hourly batches, available 247.
+Q: What is RTGS?
+A: RTGS is a real time gross settlement system used for high value transfers with immediate settlement, available 247.
+Q: What is IMPS?
+A: IMPS is an instant interbank electronic fund transfer service available 247 across banks and channels.
+Q: What is UPI?
+A: UPI is an instant payment system enabling transfers using UPI ID, mobile number, QR code, or account+IFSC, 247.
+Q: Is NEFT available 247?
+A: Yes, NEFT operates 247 in half hourly settlement cycles.
+Q: Is RTGS available 247?
+A: Yes, RTGS runs round the clock with real time settlement.
+Q: Are IMPS transfers instant?
+A: Yes, IMPS is typically completed in seconds, subject to bank uptime.
+Q: Are UPI transfers instant?
+A: Yes, UPI payments are typically instant across participating banks.
+Q: What is IFSC?
+A: IFSC is an 11 character code identifying bank branches for NEFT/RTGS/IMPS transfers.
+Q: What is UTR?
+A: UTR is a unique transaction reference used to trace and verify a payment.
+Q: What is a UPI ID (VPA)?
+A: A UPI ID is a virtual payment address like name@bank used to send or receive UPI payments.
+Q: What is the minimum balance for a savings account?
+A: It varies by bank/product; BSBD accounts are zero balance, others may need ?1,000?10,000.
+Q: What documents are required to open a bank account?
+A: Valid ID, address proof, PAN/Form 60, and a recent photograph; eKYC/Video KYC may be used.
+Q: What is KYC?
+A: Know Your Customermandatory identity, address, and risk based due diligence for banking.
+Q: What is re KYC?
+A: Periodic updating of KYC based on risk category or changes in customer details.
+Q: Can I open an account online?
+A: Yes, many banks support fully digital onboarding via eKYC/Video KYC.
+Q: What is a BSBD account?
+A: A Basic Savings Bank Deposit account offering zero balance with essential banking features.
+Q: What is a current account?
+A: A transaction focused account for businesses, usually with higher limits and low/no interest.
+Q: Do savings accounts earn interest?
+A: Yes, rates are set by banks and disclosed; interest credit frequency is bank defined.
+Q: What is a nominee?
+A: A designated peon to receive funds in the event of the account holders death.
+Q: How do I add or change a nominee?
+A: Submit a nomination form via branch or digital channels if the bank supports it.
+Q: What is either or survivor?
+A: An operating instruction where any joint holder can operate; survivor continues upon death of one.
+Q: How do I stop a cheque?
+A: Place a stop payment request before clearing via net banking, app, or branch.
+Q: What is CTS?
+A: Cheque Truncation Systemimage based clearing for faster settlement.
+Q: How fast does NEFT credit?
+A: Often within 30 minutes to a few hours due to batch processing.
+Q: How fast is RTGS credit?
+A: Real time; beneficiary receives funds immediately if systems are up.
+Q: How fast is IMPS credit?
+A: Typically seconds; delays may occur during downtime.
+Q: How fast is UPI credit?
+A: Typically seconds; failures auto refund in most cases within 2448 hours.
+Q: What is a cooling period in online banking?
+A: Temporary restrictions after adding a new beneficiary/device to mitigate risk.
+Q: Can I hold multiple bank accounts?
+A: Yes, and you can also link multiple accounts to one UPI app.
+Q: How do I update mobile number or email?
+A: Via app/net banking or branch with verification as per bank process.
+Q: What is deposit insurance?
+A: DICGC insures eligible bank deposits up to ?5 lakh per depositor per bank.
+Q: Are cooperative banks covered by DICGC?
+A: Eligible cooperative banks are covered per DICGC norms.
+Q: What is the schedule of charges?
+A: A banks published list of fees for services; banks must disclose and notify changes.
+Q: What fees might apply to ATM withdrawals?
+A: Limited free transactions; beyond that, charges per bank and network policy.
+Q: What are SMS/email/app alerts?
+A: Transaction notifications; banks are expected to provide timely alerts for security.
+Q: Should I share OTP/PIN/CVV with bank staff?
+A: Neverbanks will not ask for OTP/PIN/CVV; keep them confidential.
+Q: How do I raise a complaint?
+A: Use the banks helpdesk/app/branch; if unresolved, escalate to RBI Ombudsman.
+Q: What is an Account Aggregator (AA)?
+A: A licensed framework enabling consent based secure sharing of financial data.
+Q: What is tokenization?
+A: Replacing card PAN with a token for safer online/card not present transactions.
+Q: Is two factor authentication mandatory?
+A: Yes, 2FA is required for digital payments, with flexible methods under 2025 norms.
+Q: What is eNACH?
+A: Electronic National Automated Clearing House for recurring debits/credits via mandates.
+Q: Can I manage mandates online?
+A: Yes, most banks allow creating, pausing, and canceling mandates via app/net banking.
+Q: What is AEPS?
+A: Aadhaar Enabled Payment System for biometric transactions at banking correspondents.
+Q: Who are Banking Correspondents (BCs)?
+A: Agents enabling last mile branchless banking in undeerved areas.
+Q: What is a small account?
+A: Simplified KYC account with usage limits and enhanced monitoring.
+Q: Can minors open accounts?
+A: Yes, with guardian oveight; product terms vary by bank.
+Q: What is NRE vs NRO account?
+A: NRE holds foreign income and is repatriable; NRO manages Indian income with limited repatriation.
+Q: What is a bank locker?
+A: Safe custody service with agreements and liability limits under updated directions.
+Q: Are locker contents insured by the bank?
+A: Generally no; banks dont know the contents; liability is agreement bound.
+Q: How do I get a cheque book?
+A: Request via app/net banking/branch; eligibility depends on account type.
+Q: What is account dormancy?
+A: No customer initiated transactions for 2 years; re activation may require re KYC.
+Q: How do I close a bank account?
+A: Submit closure request after clearing dues; provide KYC and instructions for balance.
+Q: What is lien marking?
+A: A hold on deposit funds against loans/mandates or obligations.
+Q: What is NEFT charge?
+A: Most banks dont charge for NEFT online; branch transactions may have nominal feescheck schedule.
+Q: What is RTGS minimum amount?
+A: Historically ?2 lakh; present availability is 247; confirm bank specific thresholds.
+Q: What is customer liability in unauthorized transactions?
+A: Limited liability framework applies based on reporting time and negligence.
+Q: How quickly should I report fraud?
+A: Immediatelyfaster reporting narrows liability and speeds resolution.
+Q: Can I set user limits on transactions?
+A: Yes, many banks let you set per transaction/daily limits for safety.
+Q: What is device binding?
+A: Linking a specific phone/SIM to your banking/UPI app for security.
+Q: What if my phone is lost?
+A: Log out remotely if possible, revoke tokens/devices, and inform your bank to block access.
+Q: What is a debit freeze?
+A: Temporarily disabling debit functionality on your card/account via controls.
+Q: Can I enable/disable international card usage?
+A: Yes, via card controls; keep disabled unless needed.
+Q: What is an OTP?
+A: One time password used as an authentication factor; keep confidential.
+Q: What is a KFS (Key Facts Statement)?
+A: A standardized summary of key loan terms including APR, fees, and reset rules.
+Q: What is APR on loans?
+A: Annualized cost including interest and mandatory fees, expressed as a percentage.
+Q: Can I prepay a floating rate home loan?
+A: Yes, foreclosure/prepayment charges are not permitted on specified floating retail loans.
+Q: What are penal charges?
+A: Non compounding charges on defaults; penal interest compounding is barred.
+Q: What is EBLR?
+A: External Benchmark Linked Rate, often repo linked for retail loans.
+Q: Do repo changes affect my EMI?
+A: Yes for floating rate loans, at the next reset date per terms.
+Q: What is MCLR?
+A: Marginal Cost of Funds based Lending Rate, a banks internal benchmark.
+Q: Can I switch from MCLR to EBLR?
+A: Often yes, with a fee; lenders must disclose costs and options.
+Q: What is DPD?
+A: Days Past Dueused to stage delinquency for collections/reporting.
+Q: What is NPA?
+A: Non Performing Assettypically 90+ days past due under norms.
+Q: What is SARFAESI?
+A: A law enabling enforcement of secured assets after due process on default.
+Q: What is co lending?
+A: Joint lending by a bank and NBFC with shared risk and servicing.
+Q: Are MSME loans guaranteed?
+A: Some schemes provide partial guarantees; check current government/RBI schemes.
+Q: What documents are needed for loans?
+A: KYC, income proof (salary slips/ITR), bank statements, and collateral documents if secured.
+Q: What is pre EMI?
+A: Interest only payments before full disbual (e.g., under construction property).
+Q: Can EMI date be changed?
+A: Many lenders allow date changes with a service fee.
+Q: How are statements provided?
+A: Via app/net banking as PDF/CSV or printed at branch on request.
+Q: What is token provisioning?
+A: Issuing device specific tokens in place of card numbers for secure payments.
+Q: What is step up authentication?
+A: Extra verification triggered by risk scoring for high risk transactions.
+Q: Are PPIs (wallets) regulated?
+A: Yes, PPIs have KYC tiers, balance/load limits, and usage rules.
+Q: What is a payment aggregator (PA)?
+A: A regulated entity that onboards merchants and handles settlements via escrow.
+Q: What is escrow settlement for merchants?
+A: Funds are settled from regulated escrow within disclosed timelines (e.g., T+ cycles).
+Q: Can I dispute a card transaction?
+A: Yes, raise a dispute/chargeback within timelines via your bank.
+Q: What is a chargeback?
+A: A reveal claim under card network rules requiring evidence and within TAT.
+Q: How to recognize phishing?
+A: Suspicious links, urgency, or unknown domainsdo not click; verify with your bank.
+Q: Is public Wi Fi safe for banking?
+A: Avoid for sensitive transactions; prefer cellular or trusted networks.
+Q: What is account dormancy reactivation?
+A: Submit re KYC and a customer initiated transaction to activate.
+Q: What are bank grievance timelines?
+A: Banks publish TATs; if unmet, escalate to Ombudsman with evidence.
+Q: What is data minimization?
+A: Collecting and processing only necessary data with consent and retention limits.
+Q: What is CKYC?
+A: Central KYC registry enabling KYC portability across institutions.
+Q: Can I export account statements?
+A: Yes, most banks support PDF/CSV downloads in app/net banking.
+Q: Are international transfers allowed online?
+A: Under LRS with limits, purpose codes, and documentation through your bank.
+Q: What is a service request?
+A: A formal customer instruction (e.g., address change, card reissue) via app/branch.
+Q: What is marketing consent/DND?
+A: You can set communication preferences; banks must honor DND/consent.
+Q: What if I paid the wrong UPI ID?
+A: Recovery isnt guaranteed; verify recipient details before confirming.
+Q: Where can I find official rules?
+A: Refer to RBI and your banks website for current directions, FAQs, and disclosures.

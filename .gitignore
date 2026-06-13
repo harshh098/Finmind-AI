@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite3
+.env
+.env.*
+venv/
+.venv/
+agent/
+
+# FastAPI
+logs/
+*.log
+
+# Next.js
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Uploads
+uploads/
+
+# Secrets
+*.pem
+*.key
+
+# Archives
+*.zip

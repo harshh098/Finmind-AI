@@ -1,0 +1,200 @@
+Q: What is phishing?
+A: Deceptive emails or messages that mimic trusted brands to steal passwords, OTPs, or card/UPI details.
+Q: What is smishing?
+A: Phishing over SMS using malicious links or urgent texts to harvest credentials.
+Q: What is vishing?
+A: Voice phishing via phone calls where scammers pose as bank/RBI support to extract OTPs or PINs.
+Q: What is SIM swap fraud?
+A: Criminals get a duplicate SIM of your number to receive OTPs and take over accounts.
+Q: What is account takeover (ATO)?
+A: Unauthorized control of your banking or payment accounts via stolen credentials or SIM swap.
+Q: What is a UPI collect scam?
+A: Fraudsters send a request to pay, tricking you to approve; approval with PIN sends your money to them.
+Q: What is a refund scam on UPI?
+A: Scammers claim to refund and push you to enter your UPI PIN, which actually debits your account.
+Q: What is QR code fraud?
+A: Fake QR codes or links redirect to malicious pay screens or authorization pages to debit funds.
+Q: What is ATM skimming?
+A: Devices on ATMs copy card data and PIN for cloning and unauthorized withdrawals.
+Q: What is card not present (CNP) fraud?
+A: Unauthorized online transactions using stolen card details without the physical card.
+Q: What is synthetic identity fraud?
+A: Fraudsters build fake identities by mixing real and fabricated data to secure loans or accounts.
+Q: What is mule account risk?
+A: Fraudsters use your account to route stolen funds; you can face legal consequences.
+Q: What is credential stuffing?
+A: Attackers try leaked username/password combos across sites to break into accounts.
+Q: What is remote access app fraud?
+A: Scammers ask you to install screen sharing apps to capture OTPs or approve payments.
+Q: What is deepfake impeonation?
+A: AI generated voice/video used to mimic officials and trick victims into sharing secrets.
+Q: What is investment scam?
+A: Fake high return schemes or guaranteed profit groups luring you to deposit or transfer funds.
+Q: What is loan scam?
+A: Fake lenders collect fees/KYC or disbue small amounts then harass for inflated recovery.
+Q: What is job scam?
+A: Fraudulent job offers demanding fees or KYC for onboarding, later misusing your data.
+Q: What is lottery/gift scam?
+A: Messages claiming you won prizes, asking fees/charges to release the reward.
+Q: What is e mandate abuse?
+A: Unauthorized recurring debits set up via trick links or compromised credentials.
+Q: What is BIN attack?
+A: Attackers generate card numbers within a BIN range to guess valid cards for CNP fraud.
+Q: What is OTP relay?
+A: Intercepting or coercing OTP entry during login or payment authorization.
+Q: Is sharing OTP with bank staff safe?
+A: Neverbanks never ask for OTP, PIN, CVV, or full passwords.
+Q: Can someone steal money if I share UPI ID?
+A: No by itself, but approving collect requests or sharing OTP/PIN can lead to loss.
+Q: What should I do after clicking a phishing link?
+A: Disconnect data, dont enter details, change passwords, scan device, and alert your bank.
+Q: What if I installed a remote access app?
+A: Uninstall immediately, revoke app permissions, reset passwords, and inform the bank.
+Q: What if I approved a wrong UPI collect request?
+A: Raise a dispute in app, inform bank immediately, and file a cyber complaint.
+Q: What if I shared my card details on a fake site?
+A: Block card, request replacement, and monitor statements for suspicious charges.
+Q: How to spot fake bank domains?
+A: Check exact spelling, HTTPS, and known domains; avoid shortened/strange links.
+Q: How to secure devices?
+A: Update OS/apps, install from official stores, use device lock and biometrics.
+Q: Should I enable payment alerts?
+A: Yes, SMS/app/email alerts help detect and respond to unauthorized activity fast.
+Q: Are in app approvals safer than SMS OTP?
+A: In app auth reduces OTP interception risk and aligns with new authentication norms.
+Q: What is step up authentication?
+A: Extra verification triggered by risk signals for suspicious or high value payments.
+Q: How to prevent SIM swap?
+A: Set SIM change lock with telecom, keep KYC updated, and enable bank device binding.
+Q: What is device binding?
+A: Linking your bank/UPI app to a specific phone/SIM to block unauthorized devices.
+Q: How to detect malicious QR?
+A: Verify payee name on preview, amount, and source before confirming.
+Q: Is public Wi Fi safe for banking?
+A: Avoid; use mobile data or a trusted network/VPN for sensitive actions.
+Q: Can NFC contactless be abused?
+A: Set low limits, keep card in RFID sleeves, and enable channel controls.
+Q: What are merchant surreptitious refunds?
+A: Fraudsters claim to refund and instead trigger debit flows; never enter PIN to receive.
+Q: How to handle refund delays?
+A: Check rail specific TAT; for UPI refunds are often 2448h; then escalate with UTR.
+Q: What if unknown small transactions appear?
+A: Block card or channel, dispute immediately; small probes often precede larger fraud.
+Q: Are screen recordings risky?
+A: Yesnever record or share screens during banking; attackers can capture sensitive data.
+Q: Are app permissions important?
+A: Yesdeny non essential permissions, especially SMS, accessibility, and screen overlay.
+Q: What is malware risk?
+A: Malicious apps steal credentials/OTP; stick to official stores and scan devices.
+Q: What is credential phishing kit?
+A: Ready made phishing pages/tools attackers deploy to steal logins at scale.
+Q: What is refund and return fraud for merchants?
+A: Abusing return policies or chargebacks; merchants need evidence and strong policies.
+Q: What is chargeback fraud?
+A: Cardholders dispute legitimate transactions to force refunds; acquirers assess evidence.
+Q: Are deepfake calls common now?
+A: Increasingly; verify via official call backs or known numbers, not inbound requests.
+Q: What is synthetic KYC?
+A: AI altered IDs passing weak checks; lenders need stronger document and liveness checks.
+Q: What is credential reuse?
+A: Using the same password across sites; one breach can compromise bank logins.
+Q: How to design strong passwords?
+A: Use long passphrases, unique per site, stored in a password manager.
+Q: Should I enable app lock?
+A: Yesuse biometrics and PIN on banking/UPI apps for additional security.
+Q: What are risky browser practices?
+A: Saving card details or passwords in browsers without master password or OS lock.
+Q: How to verify official support contacts?
+A: Use the banks website/app for helpline numbers; avoid links from messages.
+Q: What is ATO via email compromise?
+A: Fraudsters access your email and reset banking credentials; enable email 2FA.
+Q: What is OTP bot?
+A: Automated calls or chats that trick you into dictating OTPs for attackers.
+Q: Can fraudsters hijack UPI handles?
+A: They can link your account on another device if they control your SIM and OTP; device binding helps.
+Q: What is friendly fraud?
+A: A legitimate user later disputes their own purchase; merchants must gather strong proof.
+Q: What are mule ads?
+A: Offers to earn by renting your account; participating is illegal and risky.
+Q: Is Aadhaar OTP safe to share?
+A: NeverAadhaar OTP can be misused for eKYC and loan fraud.
+Q: Are loan app permissions dangerous?
+A: Untrusted apps can harvest contacts/photos and extort; use regulated lenders only.
+Q: What is formjacking?
+A: Injecting malicious code into checkout forms to skim card data.
+Q: What is man in the middle (MITM)?
+A: Intercepting data on insecure networks; use HTTPS and avoid unknown Wi Fi.
+Q: Should I whitelist devices?
+A: Yesallow only your primary devices; remove old or unknown devices promptly.
+Q: What is device certificate binding?
+A: Cryptographic binding of your account to a device certificate to prove possession.
+Q: Are OTP less approvals safe?
+A: In app and biometric approvals can be safer when properly implemented and verified.
+Q: What is behavioral biometrics?
+A: Detecting anomalies in typing, swipes, and patterns to flag fraud.
+Q: Why keep software updated?
+A: Security patches close vulnerabilities exploited by malware and phishing kits.
+Q: What is tokenization?
+A: Replacing card PAN with randomized tokens so stolen data is useless to attackers.
+Q: How to secure recurring payments?
+A: Use e mandates from trusted apps, verify mandate details, and monitor debits.
+Q: Can I set transaction limits?
+A: Yesset daily and per transaction caps on cards and UPI for safety.
+Q: Should I disable channels I dont use?
+A: Yesturn off international, online, or contactless if not required.
+Q: What is refund TAT for UPI?
+A: Usually 2448 hours for auto reveals; escalate with UTR if delayed.
+Q: What evidence should I keep for disputes?
+A: UTR, timestamps, screenshots, messages, and merchant communication.
+Q: How to verify a payment link?
+A: Check HTTPS, domain ownehip, and amount preview; avoid short links.
+Q: Are QR receipts safe to share?
+A: Share only non sensitive parts; avoid exposing full UPI IDs or peonal data publicly.
+Q: Can OTP be bypassed?
+A: Attackers trick victims to share OTP or hijack via SIM swap; never disclose OTP.
+Q: What is A2P spam risk?
+A: Mass automated messages pushing phishing or malicious links.
+Q: How to lock credit card quickly?
+A: Use bank app card controls to lock channel or hotlist the card immediately.
+Q: What if a merchant asks for my card CVV over phone?
+A: Decline; never share CVV, OTP, or full card details over calls.
+Q: What is social engineering pretexting?
+A: Fabricated scenarios (e.g., RBI audit, tax refund) to pressure you into sharing data.
+Q: What if a caller claims to be from RBI?
+A: Hang up and call official RBI/bank numbers; RBI does not ask for OTP/PIN.
+Q: What is refund bait scam?
+A: Scammer claims accidental credit and asks you to return money via PIN input.
+Q: Can merchants store my card number?
+A: Raw PAN storage is disallowed; tokenization must be used.
+Q: How to secure email used for banking?
+A: Enable 2FA, use strong unique password, and monitor forwarding rules.
+Q: What is device attestation?
+A: Verifying device integrity (e.g., not rooted) before allowing sensitive actions.
+Q: Are rooted/jailbroken devices risky?
+A: Yesmany banking apps block access due to high fraud risk.
+Q: What is risk based authentication?
+A: Adjusting verification level based on risk signals like location, device, and velocity.
+Q: How to detect fake apps?
+A: Check publisher, reviews, download counts, and request permissions; avoid sideloading.
+Q: Should I save card in browser?
+A: Prefer tokenized vaults or bank apps; disable auto fill for sensitive data.
+Q: How to respond to unauthorized debit?
+A: Block channel, raise dispute, file cyber complaint, and monitor for follow ups.
+Q: What is the Financial Fraud Risk Indicator (FRI)?
+A: A DoT risk signal banks can integrate to screen fraud linked numbers.
+Q: What is mule detection?
+A: Analytics to identify accounts routing suspicious inflows/outflows for fraud rings.
+Q: What is device fingerprinting?
+A: Unique device characteristics used to identify risky or unknown devices.
+Q: Are NFC stickers/overlays a risk at POS?
+A: Rare but possible; inspect terminals and verify the amount before tapping.
+Q: How to secure UPI on a new phone?
+A: Re register, re bind device, set app lock, and verify linked accounts carefully.
+Q: Can screen overlays capture my inputs?
+A: Yesdeny overlay permissions to untrusted apps during banking.
+Q: What if a link asks for Aadhaar PAN together?
+A: Treat as high risk; access only via official portals and never via unknown links.
+Q: What if a friend asks to park money in my account?
+A: Declinecould be mule activity; report suspicious requests.
+Q: What is the fastest fraud response checklist?
+A: Block card/UPI, change passwords, revoke devices, raise dispute with UTR, and file a cyber complaint; then monitor alerts.

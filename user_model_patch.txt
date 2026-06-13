@@ -1,0 +1,9 @@
+# ADD this line to the User model's relationships in backend/models/user.py
+# Find the existing relationships block and add:
+#
+#   beneficiaries = relationship("Beneficiary", back_populates="user", cascade="all, delete-orphan")
+#
+# Example — the User class should have these relationships:
+#   accounts      = relationship("Account",     back_populates="user", cascade="all, delete-orphan")
+#   security_q    = relationship("SecurityQuestion", back_populates="user", uselist=False, cascade="all, delete-orphan")
+#   beneficiaries = relationship("Beneficiary", back_populates="user", cascade="all, delete-orphan")
