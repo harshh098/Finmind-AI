@@ -16,8 +16,8 @@ security = HTTPBearer()
 
 
 def hash_password(password: str) -> str:
-    password = password[:72]  # bcrypt 72 byte limit
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    password = password[:72]
+    return pwd_context.hash(password)
 
 
 def verify_password(plain: str, hashed: str) -> bool:

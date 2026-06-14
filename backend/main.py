@@ -1,12 +1,10 @@
-# FILE: backend/main.py
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-import os 
+import os
 import uvicorn
-
 
 from config import settings
 from database import create_tables
@@ -18,25 +16,32 @@ from routers import auth, banking, reminders, agent, fraud, transactions, analyt
 async def lifespan(app: FastAPI):
     print("🚀 FinMind AI starting up...")
 
-    # Register all models with Base.metadata
     from models import user, transaction, reminder, security_question  # noqa
-    # Beneficiary is defined in models.transaction — already imported above
 
-    # Create DB tables (includes beneficiaries)
     try:
         await create_tables()
         print("✅ Database tables ready")
     except Exception as e:
         print(f"⚠️  DB init error: {e}")
 
-    # Seed 6 demo users (only if DB is empty)
+    # Reset users for fresh seed
+    try:
+        from sqlalchemy import text
+        from database import AsyncSessionLocal
+        async with AsyncSessionLocal() as db:
+            await db.execute(text('DELETE FROM users CASCADE'))
+            await db.commit()
+            print("✅ Users reset")
+    except Exception as e:
+        print(f"⚠️  Reset error: {e}")
+
+    # Seed 6 demo users
     try:
         from services.seed_service import seed_demo_users
         await seed_demo_users()
     except Exception as e:
         print(f"⚠️  Seed error: {e}")
 
-    # Initialize RAG (FAISS)
     try:
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, rag_store.initialize)
@@ -44,7 +49,6 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠️  RAG init error: {e}")
 
-    # Pre-warm Isolation Forest ML model
     try:
         from services.fraud_service import _if_model
         from sqlalchemy import select
@@ -89,7 +93,6 @@ app.add_middleware(
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# Routers
 app.include_router(auth.router)
 app.include_router(banking.router)
 app.include_router(reminders.router)
