@@ -4,19 +4,20 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from models.security_question import SecurityQuestion
-from services.auth_service import pwd_context
+import bcrypt as _bcrypt
 
 LOCK_MINUTES = 30
 MAX_ATTEMPTS = 3
 
 
 def hash_answer(answer: str) -> str:
-    """Hash security answer using bcrypt. Plaintext never stored."""
-    return pwd_context.hash(answer.strip().lower())
+    a = answer.strip().lower()[:72]
+    return _bcrypt.hashpw(a.encode(), _bcrypt.gensalt()).decode()
 
 
 def verify_answer(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain.strip().lower(), hashed)
+    a = plain.strip().lower()[:72]
+    return _bcrypt.checkpw(a.encode(), hashed.encode())
 
 
 async def get_question(db: AsyncSession, user_id: int) -> Optional[SecurityQuestion]:
@@ -46,7 +47,6 @@ async def verify_security_answer(db: AsyncSession, user_id: int, plain_answer: s
                 "locked_until": sq.locked_until, "question": sq.question,
                 "error": f"Temporarily locked. Try again after {LOCK_MINUTES} minutes."}
 
-    # Auto-unlock if cooldown expired
     if sq.is_temporarily_locked and sq.locked_until:
         lu = sq.locked_until
         if lu.tzinfo is None:
