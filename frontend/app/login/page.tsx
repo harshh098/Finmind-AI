@@ -110,7 +110,6 @@ export default function LoginPage() {
                   <button key={u.email} onClick={() => { setEmail(u.email); setPassword("Demo@1234"); }}
                     className="text-left px-3 py-2 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all">
                     <div className="text-[12px] font-semibold text-slate-700">{u.label}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{u.note}</div>
                   </button>
                 ))}
               </div>
