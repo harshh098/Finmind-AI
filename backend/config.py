@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from functools import lru_cache
+import os
 
 
 class Settings(BaseSettings):
@@ -29,7 +29,6 @@ class Settings(BaseSettings):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        import os
         db = os.environ.get("DATABASE_URL", "")
         if db:
             if db.startswith("postgresql://"):
@@ -44,9 +43,8 @@ class Settings(BaseSettings):
         case_sensitive = False
 
 
-@lru_cache()
 def get_settings() -> Settings:
     return Settings()
 
 
-settings = get_settings()
+settings = Settings()
