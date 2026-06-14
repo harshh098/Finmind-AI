@@ -47,3 +47,12 @@ export const BUDGET_DEFAULTS: Record<string, number> = {
   Healthcare:3000, Education:5000, General:10000, Transfer:30000,
   Cash:10000, Gifts:3000, Loan:20000, Investment:10000, Utilities:3000,
 };
+
+export function formatTime(time: string): string {
+  // Expects "HH:mm" format
+  const [hourStr, minute] = time.split(":");
+  const hour = parseInt(hourStr, 10);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 || 12;
+  return `${displayHour}:${minute} ${ampm}`;
+}
