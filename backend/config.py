@@ -25,7 +25,11 @@ class Settings(BaseSettings):
     embedding_model: str = "all-MiniLM-L6-v2"
     faiss_index_path: str = "./rag/faiss_index"
 
-    allowed_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    allowed_origins: list[str] = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://finmind-ai-nd6w.vercel.app",
+    ]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
