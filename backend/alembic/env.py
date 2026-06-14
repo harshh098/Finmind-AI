@@ -5,12 +5,21 @@ import sys, os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from config import settings
+# Read DATABASE_URL from environment directly
+db_url = os.environ.get("DATABASE_URL", "")
+if db_url.startswith("postgresql+asyncpg://"):
+    db_url = db_url.replace("postgresql+asyncpg://", "postgresql://", 1)
+
 from database import Base
-import models  # noqa: F401 — ensure all models are imported
+import models  # noqa: F401
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.sync_database_url)
+
+if db_url:
+    config.set_main_option("sqlalchemy.url", db_url)
+else:
+    from config import settings
+    config.set_main_option("sqlalchemy.url", settings.sync_database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
