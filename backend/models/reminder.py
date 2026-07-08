@@ -35,6 +35,7 @@ class OTPSession(Base):
     payload = Column(JSON, default=dict)
     expires_at = Column(DateTime(timezone=True), nullable=False)
     used = Column(Boolean, default=False)
+    failed_attempts = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="otp_sessions")

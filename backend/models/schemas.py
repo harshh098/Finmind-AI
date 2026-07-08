@@ -51,9 +51,10 @@ class AccountOut(BaseModel):
 # ─── Transactions ─────────────────────────────────────────────────────────────
 class TransferRequest(BaseModel):
     receiver: str
-    amount: float = Field(gt=0)
+    amount: float
     message: Optional[str] = None
-    category: Optional[str] = "General"
+    category: Optional[str] = None
+    confirm_risk: bool = False   # naya field — default False, backward compatible
 
 
 class DepositRequest(BaseModel):

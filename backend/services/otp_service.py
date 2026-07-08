@@ -1,4 +1,8 @@
-"""OTP service — fixed: lazy Twilio, UTC-aware expiry, string used field."""
+"""OTP service — fixed: lazy Twilio, UTC-aware expiry, string used field.
+Failed-attempt counting: only incorrect OTP submissions increment
+failed_attempts. Unused/expired sessions are never counted. A successful
+verification resets failed_attempts on that session back to 0.
+"""
 import random, json
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -64,19 +68,38 @@ async def verify_otp(db: AsyncSession, session_id: int, otp: str, user_id: int) 
         )
     )
     session = result.scalar_one_or_none()
-    if not session or session.otp != otp:
+    if not session:
+        return None
+    if session.otp != otp:
+        # Only a genuinely wrong OTP submission counts as a failed attempt.
+        await db.execute(
+            update(OTPSession).where(OTPSession.id == session_id)
+            .values(failed_attempts=OTPSession.failed_attempts + 1)
+        )
+        await db.commit()
         return None
     expires = session.expires_at
     if expires.tzinfo is None:
         expires = expires.replace(tzinfo=timezone.utc)
     if datetime.now(timezone.utc) > expires:
         return None
-    await db.execute(update(OTPSession).where(OTPSession.id == session_id).values(used=True))
+    # Successful verification: mark used and reset failed_attempts so this
+    # session no longer contributes to the user's failed-OTP risk signal.
+    await db.execute(
+        update(OTPSession).where(OTPSession.id == session_id)
+        .values(used=True, failed_attempts=0)
+    )
     await db.commit()
     return session.payload
 
 
 async def count_failed_attempts(db: AsyncSession, user_id: int, action: str = "transfer", window_minutes: int = 60) -> int:
+    """
+    Sums failed_attempts across sessions in the window. Sessions that were
+    simply never submitted (left unused/expired) keep failed_attempts=0 by
+    construction — they are never incremented anywhere except on a wrong
+    OTP submission in verify_otp, so they don't inflate this count.
+    """
     since = datetime.now(timezone.utc) - timedelta(minutes=window_minutes)
     result = await db.execute(
         select(OTPSession).where(
@@ -85,4 +108,4 @@ async def count_failed_attempts(db: AsyncSession, user_id: int, action: str = "t
             OTPSession.created_at >= since,
         )
     )
-    return sum(1 for s in result.scalars().all() if not s.used)
+    return sum(s.failed_attempts for s in result.scalars().all())

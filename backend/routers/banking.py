@@ -1,11 +1,14 @@
-# FILE: backend/routers/banking.py
 """
 Banking router v3:
 - Deposit:  no OTP, immediate
 - Withdraw: amount <= 50000 → OTP only
              amount >  50000 → Step 1: verify security question (DB, hashed)
                                Step 2: OTP
-- Transfer: beneficiary check → fraud pre-check → OTP (or block)
+- Transfer: daily limit check → beneficiary check → fraud pre-check → OTP (or block)
+
+Daily limits and fraud thresholds are configured centrally in
+services.fraud_service (TRANSFER_DAILY_LIMIT, WITHDRAW_DAILY_LIMIT,
+DEPOSIT_DAILY_LIMIT, etc.) so all money-movement/risk tuning lives in one place.
 """
 from datetime import date as date_type
 from fastapi import APIRouter, Depends, HTTPException
@@ -13,13 +16,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from models.user import User
-from models.transaction import Account, Transaction, Beneficiary
+from models.transaction import Account, Transaction, Beneficiary, FraudLog
 from models.schemas import (TransferRequest, DepositRequest, WithdrawRequest,
                              OTPVerifyRequest, AccountOut, TransactionOut,
                              SecurityAnswerVerify, BeneficiaryCreate, BeneficiaryOut)
 from services.auth_service import get_current_user
 from services.otp_service import create_otp_session, verify_otp, count_failed_attempts
-from services.fraud_service import score_pretransfer, RISK_WARN, RISK_BLOCK
+from services.fraud_service import (
+    score_pretransfer, RISK_WARN, RISK_BLOCK,
+    TRANSFER_DAILY_LIMIT, WITHDRAW_DAILY_LIMIT, DEPOSIT_DAILY_LIMIT,
+)
 from services.security_service import get_question, verify_security_answer
 from sqlalchemy import select, func
 from datetime import date as date_type
@@ -57,14 +63,12 @@ async def _get_tx_history(db: AsyncSession, account_id: int) -> list:
     ]
 
 
-DAILY_LIMIT = 100000
-
-
 async def check_daily_limit(
     db: AsyncSession,
     account_id: int,
     tx_type: str,
     amount: float,
+    limit: float,
 ):
     result = await db.execute(
         select(func.coalesce(func.sum(Transaction.amount), 0))
@@ -77,11 +81,48 @@ async def check_daily_limit(
 
     today_total = float(result.scalar() or 0)
 
-    if today_total + amount > DAILY_LIMIT:
+    if today_total + amount > limit:
         raise HTTPException(
             status_code=400,
-            detail=f"Daily {tx_type} limit of ₹100000 exceeded. Please try again tomorrow.",
+            detail=f"Daily {tx_type} limit of ₹{limit:,.0f} exceeded. Please try again tomorrow.",
         )
+
+# ─── Daily Limits ─────────────────────────────────────────────────────────────
+async def _get_used_today(db: AsyncSession, account_id: int, tx_type: str) -> float:
+    result = await db.execute(
+        select(func.coalesce(func.sum(Transaction.amount), 0))
+        .where(
+            Transaction.account_id == account_id,
+            Transaction.type == tx_type,
+            Transaction.date == date_type.today(),
+        )
+    )
+    return float(result.scalar() or 0)
+
+
+@router.get("/limits")
+async def get_daily_limits(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    acc = await _get_account(db, current_user.id)
+
+    limits = {
+        "deposit":  DEPOSIT_DAILY_LIMIT,
+        "withdraw": WITHDRAW_DAILY_LIMIT,
+        "transfer": TRANSFER_DAILY_LIMIT,
+    }
+
+    out = {}
+    for tx_type, limit in limits.items():
+        used = await _get_used_today(db, acc.id, tx_type)
+        out[tx_type] = {
+            "daily_limit": limit,
+            "used_today": used,
+            "remaining": max(0.0, limit - used),
+        }
+    return out
+
 
 # ─── Balance & Transactions ──────────────────────────────────────────────────
 @router.get("/balance", response_model=AccountOut)
@@ -180,11 +221,12 @@ async def deposit(payload: DepositRequest,
                   db: AsyncSession = Depends(get_db)):
     acc = await _get_account(db, current_user.id)
     await check_daily_limit(
-    db,
-    acc.id,
-    "deposit",
-    payload.amount,
-  )
+        db,
+        acc.id,
+        "deposit",
+        payload.amount,
+        DEPOSIT_DAILY_LIMIT,
+    )
     acc.balance = float(acc.balance) + payload.amount
     tx = Transaction(
         account_id=acc.id, type="deposit", amount=payload.amount,
@@ -248,14 +290,15 @@ async def initiate_withdraw(
     payload: WithdrawRequest,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-  ):
+):
     acc = await _get_account(db, current_user.id)
     await check_daily_limit(
-    db,
-    acc.id,
-    "withdraw",
-    payload.amount,
-   )
+        db,
+        acc.id,
+        "withdraw",
+        payload.amount,
+        WITHDRAW_DAILY_LIMIT,
+    )
     if float(acc.balance) < payload.amount:
         raise HTTPException(status_code=400, detail="Insufficient balance")
 
@@ -312,6 +355,16 @@ async def initiate_transfer(
     if float(acc.balance) < payload.amount:
         raise HTTPException(status_code=400, detail="Insufficient balance")
 
+    # Daily transfer limit check — before beneficiary/fraud checks, same
+    # pattern as deposit/withdraw.
+    await check_daily_limit(
+        db,
+        acc.id,
+        "transfer",
+        payload.amount,
+        TRANSFER_DAILY_LIMIT,
+    )
+
     # Verify beneficiary exists for this user
     benef_result = await db.execute(
         select(Beneficiary).where(
@@ -319,34 +372,58 @@ async def initiate_transfer(
             Beneficiary.name == payload.receiver,
         )
     )
-    if benef_result.scalar_one_or_none() is None:
+
+    benef = benef_result.scalars().first()
+
+    if benef is None:
         raise HTTPException(
             status_code=400,
             detail=f"Beneficiary '{payload.receiver}' not found. Please add them before transferring."
         )
 
     history     = await _get_tx_history(db, acc.id)
-    
+
     failed_otps = await count_failed_attempts(db, current_user.id, "transfer")
     proposed    = {"type": "transfer", "amount": payload.amount,
                    "receiver": payload.receiver, "category": payload.category or "General"}
-    fraud       = score_pretransfer(proposed, history, failed_otps)
+    fraud       = score_pretransfer(proposed, history, failed_otps, user_id=current_user.id)
 
     if fraud["action"] == "blocked":
         reasons = [f["rule"] for f in fraud["flags"]]
-        raise HTTPException(status_code=403, detail={
-            "message": "Transaction blocked.",
-            "risk_score": fraud["risk_score"],
-            "flags": fraud["flags"],
-            "flag_reasons": reasons,
-            "action": "blocked",
-            "explanation": (
-                f"Your transfer of ₹{payload.amount:,.0f} to '{payload.receiver}' was blocked. "
-                f"Risk Score: {fraud['risk_score']}/100. "
-                f"Reasons: {', '.join(reasons)}. "
-                "Contact support if you believe this is an error."
-            ),
-        })
+
+        blocked_tx = Transaction(
+            account_id=acc.id,
+            type="transfer",
+            amount=payload.amount,
+            sender="Self",
+            receiver=payload.receiver,
+            message=payload.message or "Blocked by Fraud Engine",
+            category=payload.category or "General",
+            date=date_type.today(),
+            fraud_score=round(fraud["risk_score"] / 100, 3),
+            fraud_flags=[f["rule_id"] for f in fraud["flags"]],
+            is_flagged=True,
+        )
+
+        db.add(blocked_tx)
+        await db.commit()
+
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "message": "Transaction blocked.",
+                "risk_score": fraud["risk_score"],
+                "flags": fraud["flags"],
+                "flag_reasons": reasons,
+                "action": "blocked",
+                "explanation": (
+                    f"Your transfer of ₹{payload.amount:,.0f} to '{payload.receiver}' was blocked. "
+                    f"Risk Score: {fraud['risk_score']}/100. "
+                    f"Reasons: {', '.join(reasons)}. "
+                    "Contact support if you believe this is an error."
+                ),
+            },
+        )
 
     session_id, _ = await create_otp_session(
         db, user_id=current_user.id, action="transfer",

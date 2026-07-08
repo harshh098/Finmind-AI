@@ -7,8 +7,8 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = True
 
-    database_url: str = "postgresql+asyncpg://finmind:finmind123@localhost:5432/finmind_db"
-    sync_database_url: str = "postgresql://finmind:finmind123@localhost:5432/finmind_db"
+    database_url: str =  "postgresql+asyncpg://postgres:5705@localhost:5432/postgres"
+    sync_database_url: str = "postgresql://postgres:5705@localhost:5432/postgres"
 
     jwt_secret: str = "change-me-in-production"
     jwt_algorithm: str = "HS256"

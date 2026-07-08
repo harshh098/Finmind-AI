@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.orm import DeclarativeBase
 from config import settings
 
-DB_URL = "postgresql+asyncpg://postgres:BghqYvcdJMenLuakPjzFVEQNbiOPpmiD@postgres-gzfx.railway.internal:5432/railway"
+DB_URL = settings.database_url
 
 engine = create_async_engine(
     DB_URL,

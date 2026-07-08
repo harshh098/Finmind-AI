@@ -26,6 +26,12 @@ interface Beneficiary {
   account_no: string;
 }
 
+interface TransferLimitSummary {
+  daily_limit: number;
+  used_today: number;
+  remaining: number;
+}
+
 function validateAccountNo(val: string): string {
   if (!val) return "Account number is required.";
   if (!/^\d+$/.test(val)) return "Account number must contain digits only.";
@@ -73,6 +79,14 @@ export default function AccountsPage() {
   const [accNoError,       setAccNoError]       = useState("");
   const [benefBusy,        setBenefBusy]        = useState(false);
 
+  // ── NEW: Quick Transfer (recent beneficiaries) ──────────────────────────
+  const [recentBenefs,     setRecentBenefs]     = useState<Beneficiary[]>([]);
+  const [recentBenefsBusy, setRecentBenefsBusy] = useState(false);
+
+  // ── NEW: Daily Limit summary ──────────────────────────────────────────────
+  const [limitSummary,     setLimitSummary]     = useState<TransferLimitSummary | null>(null);
+  const [limitSummaryBusy, setLimitSummaryBusy] = useState(false);
+
   const income  = transactions.filter(tx => tx.type === "deposit").reduce((s, tx) => s + tx.amount, 0);
   const expense = transactions.filter(tx => tx.type !== "deposit").reduce((s, tx) => s + tx.amount, 0);
 
@@ -87,6 +101,10 @@ export default function AccountsPage() {
     setSearchQuery(""); setSearchBusy(false); setSearchDone(false);
     setSelectedBenef(null); setBenefFoundMsg(""); setShowAddForm(false);
     setNewBenefName(""); setNewBenefAccNo(""); setAccNoError("");
+    if (f === "transfer") {
+      fetchRecentBeneficiaries();
+      fetchLimitSummary();
+    }
   }
   function closeFlow() { openFlow(null); }
 
@@ -95,6 +113,63 @@ export default function AccountsPage() {
     if (n) addNotification(n);
     await refreshBalance();
     await refreshTx();
+  }
+
+    // ── NEW: fetch recent beneficiaries for Quick Transfer ───────────────────
+  async function fetchRecentBeneficiaries() {
+    setRecentBenefsBusy(true);
+    try {
+      const res = await bankingApi.getBeneficiaries();
+
+      const recent = [...(res.data || [])]
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 3);
+
+      setRecentBenefs(recent);
+    } catch {
+      // Fail silently — Quick Transfer is a convenience feature, not core flow
+      setRecentBenefs([]);
+    } finally {
+      setRecentBenefsBusy(false);
+    }
+  }
+
+  // ── NEW: fetch daily transfer limit summary ──────────────────────────────
+async function fetchLimitSummary() {
+  setLimitSummaryBusy(true);
+
+  try {
+    const res = await bankingApi.getLimits();
+
+    console.log("SUCCESS");
+    console.log(res.status);
+    console.log(res.data);
+
+    setLimitSummary(res.data.transfer);
+  } catch (err: any) {
+    console.error("========== LIMIT ERROR ==========");
+    console.error("Status:", err.response?.status);
+    console.error("Data:", err.response?.data);
+    console.error("Headers:", err.response?.headers);
+    console.error("URL:", err.config?.url);
+    console.error("Request:", err.config);
+    console.error(err);
+    console.error("================================");
+
+    setLimitSummary(null);
+  } finally {
+    setLimitSummaryBusy(false);
+  }
+}
+
+  // ── NEW: Quick Transfer click — reuses existing "found" flow exactly ────
+  function handleQuickTransferSelect(benef: Beneficiary) {
+    setSearchQuery(benef.name);
+    setSearchDone(true);
+    setSelectedBenef(benef);
+    setBenefFoundMsg(`Beneficiary found: ${benef.name} (${benef.account_no})`);
+    setShowAddForm(false);
+    setError("");
   }
 
   // ── Search Beneficiary ────────────────────────────────────────────────────
@@ -261,6 +336,10 @@ export default function AccountsPage() {
         : await bankingApi.verifyWithdraw(otp, sessionId);
       await afterSuccess(res);
       setToast({ msg: res.data.message, type: "success" });
+      // NEW: refresh daily limit summary after a successful transfer
+      if (flow === "transfer") {
+        fetchLimitSummary();
+      }
       closeFlow();
     } catch (e: any) {
       setError(e?.response?.data?.detail || t("invalidOtp"));
@@ -383,6 +462,28 @@ export default function AccountsPage() {
       >
         <div className="flex flex-col gap-3">
 
+          {/* NEW: Quick Transfer — recently used beneficiaries */}
+          {recentBenefs.length > 0 && (
+            <div>
+              <label className="label-sm">Quick Transfer</label>
+              <div className="flex gap-2 flex-wrap">
+                {recentBenefs.slice(0, 3).map(rb => (
+                  <button
+                    key={rb.id}
+                    onClick={() => handleQuickTransferSelect(rb)}
+                    className={`px-3 py-1.5 rounded-full text-[12px] font-semibold border transition-all active:scale-95 ${
+                      selectedBenef?.id === rb.id
+                        ? "bg-indigo-600 text-white border-indigo-600"
+                        : "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100"
+                    }`}
+                  >
+                    {rb.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Beneficiary Search */}
           <div>
             <label className="label-sm">Recipient Name / Account Number</label>
@@ -480,8 +581,32 @@ export default function AccountsPage() {
             <label className="label-sm">{t("amount")} (₹)</label>
             <input value={amount} onChange={e=>setAmount(e.target.value)} placeholder="Enter amount" type="number" className="input"/>
             <p className="text-[11px] text-slate-500 mt-1">
-              Daily transfer limit: ₹1,00,000
             </p>
+          </div>
+
+          {/* NEW: Daily Limit Card */}
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2">Daily Limit</p>
+            {limitSummaryBusy && !limitSummary ? (
+              <p className="text-[12px] text-slate-400">Loading…</p>
+            ) : limitSummary ? (
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <div className="text-[10px] text-slate-400">Daily Limit</div>
+                  <div className="text-[13px] font-bold text-slate-800">{formatCurrency(limitSummary.daily_limit)}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400">Used Today</div>
+                  <div className="text-[13px] font-bold text-amber-600">{formatCurrency(limitSummary.used_today)}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400">Remaining</div>
+                  <div className="text-[13px] font-bold text-emerald-600">{formatCurrency(limitSummary.remaining)}</div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-[12px] text-slate-400">Unable to load limit summary.</p>
+            )}
           </div>
 
           {/* Note */}
