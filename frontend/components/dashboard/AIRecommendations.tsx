@@ -8,8 +8,8 @@ import { useT } from "@/lib/i18n";
 export default function AIRecommendations() {
   const { transactions, reminders } = useBankingStore();
   const t = useT();
-  const income       = transactions.filter(tx => tx.type === "deposit").reduce((s, tx) => s + tx.amount, 0);
-  const expense      = transactions.filter(tx => tx.type !== "deposit").reduce((s, tx) => s + tx.amount, 0);
+  const income       = transactions.filter(tx => tx.type === "deposit" && tx.status === "completed").reduce((s, tx) => s + tx.amount, 0);
+  const expense      = transactions.filter(tx => tx.type !== "deposit" && tx.status === "completed").reduce((s, tx) => s + tx.amount, 0);
   const savingsRate  = income > 0 ? Math.round(((income - expense) / income) * 100) : 0;
   const fraudCount   = transactions.filter(tx => tx.is_flagged).length;
   const pendingEMIs  = reminders.filter(r => r.type === "emi" && r.status === "pending").length;

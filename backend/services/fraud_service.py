@@ -288,7 +288,7 @@ def apply_rules(tx: dict, ctx: Optional[dict] = None,
 
 
 def compute_risk_score(flags: List[dict], ml_score: float = 0.0) -> int:
-    rule_score = min(70, sum(f["weight"] for f in flags))
+    rule_score = min(90, sum(f["weight"] for f in flags))
     return min(100, rule_score + round(ml_score * 30))
 
 
@@ -353,14 +353,29 @@ def analyze_all_transactions(transactions: List[dict], user_id: Optional[int] = 
     alerts = []
 
     for tx in transactions:
-        flags = apply_rules(tx, ctx)
-        ml    = model.score(tx)
-        if ml > 0.5:
-            r = next(r for r in FRAUD_RULES if r["id"] == "R010")
-            flags.append({"rule_id": r["id"], "rule": r["rule"],
-                          "severity": r["severity"], "weight": r["weight"]})
+        # Use saved fraud result for blocked transactions
+        if tx.get("status") == "blocked":
+            alerts.append({
+                "transaction_id": tx.get("id"),
+                "type": tx.get("type"),
+                "amount": float(tx.get("amount", 0)),
+                "receiver": tx.get("receiver"),
+                "sender": tx.get("sender"),
+                "date": str(tx.get("date")),
+                "risk_score": round(tx.get("fraud_score", 1.0) * 100),
+                "ml_score": 0,
+                "flags": [next((r for r in FRAUD_RULES if r["id"] == fid), {"rule_id": fid, "rule": fid, "severity": "high", "weight": 0}) for fid in (tx.get("fraud_flags") or [])],
+                "flag_ids": list(tx.get("fraud_flags") or []),
+                
+                "max_severity": "high",
+                "action": "blocked",
+            })
+            continue
 
+        flags = apply_rules(tx, ctx)
+        ml = model.score(tx)
         score = compute_risk_score(flags, ml)
+
         if flags or ml > 0.55:
             sevs    = [f["severity"] for f in flags]
             max_sev = "high" if "high" in sevs else ("medium" if "medium" in sevs else "low")
@@ -374,12 +389,12 @@ def analyze_all_transactions(transactions: List[dict], user_id: Optional[int] = 
                 "risk_score":     score,
                 "ml_score":       round(ml, 4),
                 "flags":          flags,
-                "flag_ids":       [f["rule_id"] for f in flags],
+                "flag_ids": list(tx.get("fraud_flags") or []),
                 "max_severity":   max_sev,
                 "action":         classify_risk(score),
             })
 
-    alerts.sort(key=lambda x: x["risk_score"], reverse=True)
+    alerts.sort(key=lambda x: x["date"], reverse=True)
     high    = [a for a in alerts if a["max_severity"] == "high"]
     medium  = [a for a in alerts if a["max_severity"] == "medium"]
     low     = [a for a in alerts if a["max_severity"] == "low"]

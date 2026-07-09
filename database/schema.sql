@@ -1,3 +1,4 @@
+-- FILE: schema.sql
 -- FinMind AI — PostgreSQL Schema
 -- Run: psql -U finmind -d finmind_db -f schema.sql
 
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     fraud_score   FLOAT DEFAULT 0.0,
     fraud_flags   JSONB DEFAULT '[]'::jsonb,
     is_flagged    BOOLEAN DEFAULT FALSE,
+    status        VARCHAR(20) NOT NULL DEFAULT 'completed' CHECK (status IN ('completed','blocked','warning')),
     created_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -50,6 +52,7 @@ CREATE INDEX idx_transactions_account_id ON transactions(account_id);
 CREATE INDEX idx_transactions_date ON transactions(date DESC);
 CREATE INDEX idx_transactions_type ON transactions(type);
 CREATE INDEX idx_transactions_is_flagged ON transactions(is_flagged);
+CREATE INDEX idx_transactions_status ON transactions(status);
 
 -- ─── Reminders ───────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS reminders (

@@ -1,3 +1,4 @@
+# FILE: backend/routers/banking.py
 """
 Banking router v3:
 - Deposit:  no OTP, immediate
@@ -9,6 +10,11 @@ Banking router v3:
 Daily limits and fraud thresholds are configured centrally in
 services.fraud_service (TRANSFER_DAILY_LIMIT, WITHDRAW_DAILY_LIMIT,
 DEPOSIT_DAILY_LIMIT, etc.) so all money-movement/risk tuning lives in one place.
+
+NOTE: Daily limit usage (check_daily_limit / _get_used_today) counts ONLY
+transactions with status == "completed". Blocked fraud transactions are
+still persisted (for audit/history) with status == "blocked" and are
+excluded from daily usage totals.
 """
 from datetime import date as date_type
 from fastapi import APIRouter, Depends, HTTPException
@@ -44,8 +50,15 @@ async def _get_account(db: AsyncSession, user_id: int) -> Account:
 
 
 async def _get_tx_history(db: AsyncSession, account_id: int) -> list:
+    # Only completed transactions feed fraud pattern-detection (velocity,
+    # smurfing, recipient counts, ML baseline) — aligned with
+    # check_daily_limit/_get_used_today so blocked attempts don't
+    # double-count as behavioral signal on top of being blocked.
     result = await db.execute(
-        select(Transaction).where(Transaction.account_id == account_id)
+        select(Transaction).where(
+            Transaction.account_id == account_id,
+            Transaction.status == "completed",
+        )
     )
 
     return [
@@ -70,12 +83,16 @@ async def check_daily_limit(
     amount: float,
     limit: float,
 ):
+    # Only status == "completed" transfers count toward daily usage.
+    # Blocked fraud transactions are persisted for audit/history but must
+    # never consume the daily limit, since no money actually moved.
     result = await db.execute(
         select(func.coalesce(func.sum(Transaction.amount), 0))
         .where(
             Transaction.account_id == account_id,
             Transaction.type == tx_type,
             Transaction.date == date_type.today(),
+            Transaction.status == "completed",
         )
     )
 
@@ -87,18 +104,36 @@ async def check_daily_limit(
             detail=f"Daily {tx_type} limit of ₹{limit:,.0f} exceeded. Please try again tomorrow.",
         )
 
-# ─── Daily Limits ─────────────────────────────────────────────────────────────
 async def _get_used_today(db: AsyncSession, account_id: int, tx_type: str) -> float:
-    result = await db.execute(
-        select(func.coalesce(func.sum(Transaction.amount), 0))
-        .where(
+    debug = await db.execute(
+        select(Transaction).where(
             Transaction.account_id == account_id,
             Transaction.type == tx_type,
             Transaction.date == date_type.today(),
         )
     )
-    return float(result.scalar() or 0)
 
+    print("\n========== TRANSFERS TODAY ==========")
+    for t in debug.scalars().all():
+        print(
+            f"id={t.id} amount={t.amount} status={t.status} "
+            f"flagged={t.is_flagged} receiver={t.receiver}"
+        )
+    print("=====================================\n")
+
+    result = await db.execute(
+        select(func.coalesce(func.sum(Transaction.amount), 0)).where(
+            Transaction.account_id == account_id,
+            Transaction.type == tx_type,
+            Transaction.date == date_type.today(),
+            Transaction.status == "completed",
+        )
+    )
+
+    used = float(result.scalar() or 0)
+    print(f"USED TODAY = {used}")
+
+    return used
 
 @router.get("/limits")
 async def get_daily_limits(
@@ -233,6 +268,7 @@ async def deposit(payload: DepositRequest,
         sender=payload.sender or "External", receiver="Self",
         message=payload.message or "Deposit", category=payload.category or "Income",
         date=date_type.today(), fraud_score=0.0, fraud_flags=[], is_flagged=False,
+        status="completed",
     )
     db.add(tx)
     await db.commit()
@@ -330,6 +366,7 @@ async def verify_withdraw(
         account_id=acc.id, type="withdraw", amount=data["amount"],
         sender="Self", receiver="Cash", message="Cash Withdrawal", category="Cash",
         date=date_type.today(), fraud_score=0.0, fraud_flags=[], is_flagged=False,
+        status="completed",
     )
     db.add(tx)
     await db.commit()
@@ -403,6 +440,7 @@ async def initiate_transfer(
             fraud_score=round(fraud["risk_score"] / 100, 3),
             fraud_flags=[f["rule_id"] for f in fraud["flags"]],
             is_flagged=True,
+            status="blocked",
         )
 
         db.add(blocked_tx)
@@ -425,6 +463,16 @@ async def initiate_transfer(
             },
         )
 
+    if fraud["action"] == "warning" and not getattr(payload, "confirm_risk", False):
+        return {
+            "status": "warning",
+            "message": "Transaction flagged as risky. Confirm to proceed.",
+            "fraud_check": {
+                "risk_score": fraud["risk_score"], "risk_level": fraud["risk_level"],
+                "flags": fraud["flags"], "action": fraud["action"],
+            },
+        }
+
     session_id, _ = await create_otp_session(
         db, user_id=current_user.id, action="transfer",
         payload={
@@ -445,7 +493,6 @@ async def initiate_transfer(
             "flags": fraud["flags"], "action": fraud["action"],
         },
     }
-
 
 @router.post("/transfer/verify")
 async def verify_transfer(
@@ -469,6 +516,7 @@ async def verify_transfer(
         category=data.get("category", "General"), date=date_type.today(),
         fraud_score=round(risk_score / 100, 3), fraud_flags=flag_ids,
         is_flagged=risk_score >= RISK_WARN,
+        status="completed",
     )
     db.add(tx)
     await db.commit()
@@ -482,3 +530,10 @@ async def verify_transfer(
                          "body": f"₹{data['amount']:,.0f} sent to {data['receiver']}.",
                          "color": "#6366f1"},
     }
+
+
+
+
+
+
+    

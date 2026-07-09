@@ -6,6 +6,7 @@ export interface Transaction {
   amount: number; sender?: string; receiver?: string;
   message?: string; category?: string; date: string;
   fraud_score: number; fraud_flags: string[]; is_flagged: boolean;
+  status: "completed" | "blocked" | "warning";
 }
 export interface Reminder {
   rid: number; type: string; task: string; date: string;

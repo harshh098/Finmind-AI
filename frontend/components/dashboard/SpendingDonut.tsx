@@ -9,7 +9,7 @@ export default function SpendingDonut() {
   const { transactions } = useBankingStore();
   const byCat: Record<string, number> = {};
   for (const t of transactions) {
-    if (t.type === "deposit") continue;
+    if (t.type === "deposit" || t.status !== "completed") continue;
     const c = t.category || "General";
     byCat[c] = (byCat[c] || 0) + t.amount;
   }

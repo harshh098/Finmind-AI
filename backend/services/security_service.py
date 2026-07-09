@@ -44,7 +44,7 @@ async def verify_security_answer(db: AsyncSession, user_id: int, plain_answer: s
 
     if is_locked(sq):
         return {"success": False, "locked": True, "attempts_left": 0,
-                "locked_until": sq.locked_until, "question": sq.question,
+                "locked_until": sq.locked_until.isoformat() if sq.locked_until else None, "question": sq.question,
                 "error": f"Temporarily locked. Try again after {LOCK_MINUTES} minutes."}
 
     if sq.is_temporarily_locked and sq.locked_until:
@@ -74,7 +74,7 @@ async def verify_security_answer(db: AsyncSession, user_id: int, plain_answer: s
     return {
         "success": False, "locked": sq.is_temporarily_locked,
         "attempts_left": max(0, left),
-        "locked_until": sq.locked_until, "question": sq.question,
+        "locked_until": sq.locked_until.isoformat() if sq.locked_until else None, "question": sq.question,
         "error": (f"Incorrect answer. {max(0, left)} attempt(s) remaining."
                   if not sq.is_temporarily_locked
                   else f"Too many incorrect answers. Withdrawal locked for {LOCK_MINUTES} minutes."),

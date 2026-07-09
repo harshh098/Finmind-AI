@@ -9,8 +9,8 @@ export default function BalanceCards() {
   const { balance, transactions, setBalance } = useBankingStore();
 
   // Derive income/expense from real transactions
-  const totalIncome  = transactions.filter(t => t.type === "deposit").reduce((s, t) => s + t.amount, 0);
-  const totalExpense = transactions.filter(t => t.type !== "deposit").reduce((s, t) => s + t.amount, 0);
+  const totalIncome  = transactions.filter(t => t.type === "deposit" && t.status === "completed").reduce((s, t) => s + t.amount, 0);
+  const totalExpense = transactions.filter(t => t.type !== "deposit" && t.status === "completed").reduce((s, t) => s + t.amount, 0);
   const savings      = totalIncome - totalExpense;
   const savingsRate  = totalIncome > 0 ? Math.round((savings / totalIncome) * 100) : 0;
 

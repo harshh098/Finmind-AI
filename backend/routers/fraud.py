@@ -27,7 +27,9 @@ async def _load_user_transactions(db: AsyncSession, user_id: int) -> list:
             "id": t.id, "type": t.type, "amount": float(t.amount),
             "sender": t.sender, "receiver": t.receiver,
             "date": str(t.date), "category": t.category,
-            "created_at": t.created_at,
+            "created_at": t.created_at, "status": t.status,
+            "is_flagged": t.is_flagged,"fraud_score": t.fraud_score,
+            "fraud_flags": t.fraud_flags,
         }
         for t in tx_result.scalars().all()
     ]

@@ -85,6 +85,7 @@ class TransactionOut(BaseModel):
     fraud_score: float
     fraud_flags: List[Any]
     is_flagged: bool
+    status: str
 
     class Config:
         from_attributes = True

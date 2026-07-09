@@ -1,3 +1,4 @@
+# FILE: backend/models/transaction.py
 from sqlalchemy import (Column, Integer, String, Numeric, Date, Float,
                         Boolean, DateTime, Text, JSON, ForeignKey, func)
 from sqlalchemy.orm import relationship
@@ -36,6 +37,11 @@ class Transaction(Base):
     fraud_score = Column(Float, default=0.0)
     fraud_flags = Column(JSON, default=list)
     is_flagged = Column(Boolean, default=False)
+    # completed | blocked | warning — daily limit usage (banking.py) counts
+    # ONLY status == "completed" transfers/withdrawals/deposits. Blocked
+    # fraud transactions are persisted for audit/history but excluded from
+    # limit totals.
+    status = Column(String(20), nullable=False, default="completed")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     account = relationship("Account", back_populates="transactions")

@@ -87,8 +87,8 @@ export default function AccountsPage() {
   const [limitSummary,     setLimitSummary]     = useState<TransferLimitSummary | null>(null);
   const [limitSummaryBusy, setLimitSummaryBusy] = useState(false);
 
-  const income  = transactions.filter(tx => tx.type === "deposit").reduce((s, tx) => s + tx.amount, 0);
-  const expense = transactions.filter(tx => tx.type !== "deposit").reduce((s, tx) => s + tx.amount, 0);
+  const income  = transactions.filter(tx => tx.type === "deposit" && tx.status === "completed").reduce((s, tx) => s + tx.amount, 0);
+  const expense = transactions.filter(tx => tx.type !== "deposit" && tx.status === "completed").reduce((s, tx) => s + tx.amount, 0);
 
   const accNoValidationError = validateAccountNo(newBenefAccNo);
   const canAddBeneficiary = newBenefName.trim().length > 0 && accNoValidationError === "";
@@ -203,31 +203,61 @@ async function fetchLimitSummary() {
   }
 
   // ── Transfer initiate ─────────────────────────────────────────────────────
-  async function handleTransferInitiate(benef: Beneficiary) {
-    const amt = parseFloat(amount);
-    setBusy(true); setError("");
-    try {
-      const res = await bankingApi.initiateTransfer(benef.name, amt, note, category);
-      const fc  = res.data.fraud_check;
-      setFraudInfo(fc);
-      setSessionId(res.data.session_id);
-      if (fc?.action === "warning") {
-        setStep("fraud_warn");
-      } else {
-        setStep("otp");
-        setToast({ msg: t("otpSent"), type: "info" });
-      }
-    } catch (e: any) {
-      const detail = e?.response?.data?.detail;
-      if (detail?.action === "blocked") {
-        setBlockedInfo(detail); setStep("blocked");
-      } else {
-        setError(typeof detail === "string" ? detail : t("error"));
-        setStep("form");
-      }
-    } finally { setBusy(false); }
-  }
+async function handleTransferInitiate(benef: Beneficiary) {
+  const amt = parseFloat(amount);
 
+  setBusy(true);
+  setError("");
+
+  try {
+    const res = await bankingApi.initiateTransfer(
+      benef.name,
+      amt,
+      note,
+      category
+    );
+
+    // Backend returned a warning -> DO NOT open OTP yet
+    if (res.data.status === "warning") {
+      setFraudInfo(res.data.fraud_check);
+      setStep("fraud_warn");
+      return;
+    }
+
+    // OTP session already created
+    setFraudInfo(res.data.fraud_check);
+    setSessionId(res.data.session_id);
+
+    setStep("otp");
+    setToast({
+      msg: t("otpSent"),
+      type: "info",
+    });
+
+  } catch (e: any) {
+    const detail = e?.response?.data?.detail;
+
+    if (detail?.action === "blocked") {
+      setBlockedInfo(detail);
+      setStep("blocked");
+      // FIX: a blocked transaction is persisted for audit but must never
+      // count toward the daily limit. The card was still showing a stale
+      // "used today" value from before this attempt, so refresh it here
+      // to reflect the backend's true (unaffected) usage total.
+      fetchLimitSummary();
+    } else {
+      setError(
+        typeof detail === "string"
+          ? detail
+          : t("error")
+      );
+      setStep("form");
+    }
+
+  } finally {
+    setBusy(false);
+  }
+}
   // ── Transfer form — Next ──────────────────────────────────────────────────
   async function handleTransferFormNext() {
     const amt = parseFloat(amount);
@@ -297,6 +327,32 @@ async function fetchLimitSummary() {
       }
     } finally { setBusy(false); }
   }
+
+
+  async function handleWarningContinue() {
+  if (!selectedBenef) return;
+
+  setBusy(true);
+
+  try {
+    const res = await bankingApi.initiateTransfer(
+      selectedBenef.name,
+      parseFloat(amount),
+      note,
+      category,
+      true // confirm_risk
+    );
+
+    setFraudInfo(res.data.fraud_check);
+    setSessionId(res.data.session_id);
+    setStep("otp");
+    setToast({ msg: t("otpSent"), type: "info" });
+  } catch (e: any) {
+    setError(e?.response?.data?.detail || "Failed");
+  } finally {
+    setBusy(false);
+  }
+}
 
   // ── Security answer verify ────────────────────────────────────────────────
   async function handleSecurityConfirm() {
@@ -730,7 +786,7 @@ async function fetchLimitSummary() {
           <div className="flex gap-2">
             <button
               className="flex-1 py-2.5 rounded-lg bg-amber-500 text-white font-semibold text-[13px] hover:bg-amber-600"
-              onClick={() => { setStep("otp"); setToast({ msg: t("otpSent"), type: "info" }); }}
+              onClick={handleWarningContinue}
             >
               Continue
             </button>

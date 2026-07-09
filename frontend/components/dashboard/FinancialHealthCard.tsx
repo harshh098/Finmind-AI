@@ -6,8 +6,8 @@ import { useBankingStore } from "@/lib/store";
 
 export default function FinancialHealthCard() {
   const { transactions, reminders } = useBankingStore();
-  const income  = transactions.filter(t => t.type === "deposit").reduce((s, t) => s + t.amount, 0);
-  const expense = transactions.filter(t => t.type !== "deposit").reduce((s, t) => s + t.amount, 0);
+  const income  = transactions.filter(t => t.type === "deposit" && t.status === "completed").reduce((s, t) => s + t.amount, 0);
+  const expense = transactions.filter(t => t.type !== "deposit" && t.status === "completed").reduce((s, t) => s + t.amount, 0);
   const savingsRate   = income > 0 ? Math.round(((income - expense) / income) * 100) : 0;
   const fraudCount    = transactions.filter(t => t.is_flagged).length;
   const reminderCount = reminders.filter(r => r.status === "pending").length;
