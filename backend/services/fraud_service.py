@@ -6,7 +6,7 @@ from collections import defaultdict
 import numpy as np
 
 # ─── Thresholds ───────────────────────────────────────────────────────────────
-RISK_WARN  = 60
+RISK_WARN  = 60   # user will get warning before genrating otp 
 RISK_BLOCK = 85
 
 # ─── Daily limits (restored — required by banking.py) ─────────────────────────
