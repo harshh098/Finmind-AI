@@ -14,8 +14,11 @@ import { computeDynamicBudgets } from "@/lib/budgets";
 export default function ExpenseTrackerPage() {
   const { transactions } = useBankingStore();
 
-  const income  = transactions.filter(t => t.type === "deposit").reduce((s, t) => s + t.amount, 0);
-  const expense = transactions.filter(t => t.type !== "deposit").reduce((s, t) => s + t.amount, 0);
+  // Only status === "completed" transactions represent money that
+  // actually moved — a "blocked" fraud transaction never left the
+  // account, so it must never be counted as income or expense here.
+  const income  = transactions.filter(t => t.type === "deposit" && t.status === "completed").reduce((s, t) => s + t.amount, 0);
+  const expense = transactions.filter(t => t.type !== "deposit" && t.status === "completed").reduce((s, t) => s + t.amount, 0);
   const savings = income - expense;
   const savingsRate = income > 0 ? Math.round((savings / income) * 100) : 0;
 
@@ -24,7 +27,7 @@ export default function ExpenseTrackerPage() {
 
   const byCat: Record<string, number> = {};
   for (const t of transactions) {
-    if (t.type === "deposit") continue;
+    if (t.type === "deposit" || t.status !== "completed") continue;
     const c = t.category || "General";
     byCat[c] = (byCat[c] || 0) + t.amount;
   }
@@ -39,7 +42,7 @@ export default function ExpenseTrackerPage() {
     }));
 
   const significant = [...transactions]
-    .filter(t => t.type !== "deposit" && t.amount >= 1000)
+    .filter(t => t.type !== "deposit" && t.status === "completed" && t.amount >= 1000)
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 6);
 

@@ -14,10 +14,10 @@ export default function BudgetTracker() {
 
   const byCat: Record<string, number> = {};
   for (const t of transactions) {
-    if (t.type === "deposit") continue;
+    if (t.type === "deposit" || t.status !== "completed") continue;
     const c = t.category || "General";
     byCat[c] = (byCat[c] || 0) + t.amount;
-  }
+ }
 
   const rows = Object.entries(byCat)
     .filter(([k]) => k in dynamicBudgets)
@@ -28,11 +28,11 @@ export default function BudgetTracker() {
   let totalIncome = 0;
   const incomeMonths = new Set<string>();
   for (const t of transactions) {
-    if (t.type === "deposit") {
+    if (t.type === "deposit" && t.status === "completed") {
       totalIncome += t.amount;
       incomeMonths.add(t.date.slice(0, 7));
-    }
   }
+}
   const avgIncome = totalIncome / (incomeMonths.size || 1);
 
   return (

@@ -11,9 +11,11 @@ export default function CategoryBreakdown() {
 
   const dynamicBudgets = computeDynamicBudgets(transactions);
 
+  // Only status === "completed" transactions count toward actual spend —
+  // blocked fraud transactions never moved money and must be excluded.
   const byCat: Record<string, number> = {};
   for (const t of transactions) {
-    if (t.type === "deposit") continue;
+    if (t.type === "deposit" || t.status !== "completed") continue;
     const c = t.category || "General";
     byCat[c] = (byCat[c] || 0) + t.amount;
   }

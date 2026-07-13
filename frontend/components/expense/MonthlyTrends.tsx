@@ -9,6 +9,9 @@ export default function MonthlyTrends() {
   const { transactions } = useBankingStore();
   const byMonth: Record<string, { income: number; expense: number }> = {};
   for (const t of transactions) {
+    // Blocked transactions never moved money — exclude them from the
+    // monthly income/expense trend so the chart matches actual cash flow.
+    if (t.status !== "completed") continue;
     const mo = t.date.slice(0, 7);
     if (!byMonth[mo]) byMonth[mo] = { income: 0, expense: 0 };
     if (t.type === "deposit") byMonth[mo].income += t.amount;
