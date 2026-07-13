@@ -1,6 +1,7 @@
 -- FILE: schema.sql
 -- FinMind AI — PostgreSQL Schema
 -- Run: psql -U finmind -d finmind_db -f schema.sql
+-- Postgres
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
