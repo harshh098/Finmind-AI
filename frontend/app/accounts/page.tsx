@@ -1,4 +1,4 @@
-"use client";
+"use client";  // full accounts frontend setup
 import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import MetricCard from "@/components/ui/MetricCard";
