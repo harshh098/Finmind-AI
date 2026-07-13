@@ -12,9 +12,9 @@ RISK_BLOCK = 85
 # ─── Daily limits (restored — required by banking.py) ─────────────────────────
 TRANSFER_DAILY_LIMIT = 100000
 WITHDRAW_DAILY_LIMIT = 100000
-DEPOSIT_DAILY_LIMIT  = 100000
+DEPOSIT_DAILY_LIMIT  = 200000
 
-# ─── Rule definitions (R005 removed) ─────────────────────────────────────────
+# ─── Rule definitions ─────────────────────────────────────────────────────────
 FRAUD_RULES = [
     {"id": "R001", "rule": "Large transfer (> 75,000)",            "severity": "high",   "weight": 20},
     {"id": "R002", "rule": "Multiple transfers to same recipient today","severity": "medium", "weight": 20},
@@ -27,6 +27,11 @@ FRAUD_RULES = [
     {"id": "R010", "rule": "Isolation Forest anomaly detected",        "severity": "medium","weight": 25},
     {"id": "R011", "rule": "Multi-recipient smurfing (several distinct recipients in short window)", "severity": "medium", "weight": 20},
     {"id": "R012", "rule": "Cumulative exposure to new beneficiaries today", "severity": "medium", "weight": 20},
+    {"id": "R013", "rule": "Dormant account reactivation (60+ days inactive)", "severity": "medium", "weight": 20},
+    {"id": "R014", "rule": "Balance sweep (>90% of balance transferred)", "severity": "medium", "weight": 18},
+    {"id": "R015", "rule": "Small test transfer followed by large transfer", "severity": "high", "weight": 22},
+    {"id": "R016", "rule": "Escalating transfer ladder (progressively increasing amounts same day)", "severity": "medium", "weight": 18},
+    {"id": "R017", "rule": "High-value transfer floor (>= ₹50,000) — guaranteed review", "severity": "medium", "weight": 15},
 ]
 
 
@@ -84,10 +89,6 @@ class _IsolationForestModel:
 
 
 # ─── Per-user model cache ─────────────────────────────────────────────────────
-# Keyed by user_id (falls back to a shared "_global" bucket when no user_id
-# is supplied, e.g. legacy callers or dashboard-wide batch analysis) so each
-# user's Isolation Forest reflects their own transaction behavior instead of
-# a single model shared across all accounts.
 _if_models: Dict[Any, _IsolationForestModel] = {}
 _GLOBAL_KEY = "_global"
 
@@ -98,10 +99,8 @@ def _get_or_train_model(user_id: Optional[int] = None,
     Returns the Isolation Forest model for `user_id`, creating and/or
     training it on `historical` if it doesn't exist yet or hasn't been
     trained (and enough samples, >= 5, are available). Falls back to a
-    shared global-key model when user_id is None, preserving compatibility
-    with any caller (e.g. batch dashboard analysis) that doesn't have a
-    per-user context. Safe to call with no historical data (e.g. at app
-    startup) — returns the untrained model, and `.score()` already
+    shared global-key model when user_id is None. Safe to call with no
+    historical data — returns the untrained model, and `.score()` already
     degrades gracefully to 0.0 in that case.
     """
     key = user_id if user_id is not None else _GLOBAL_KEY
@@ -127,11 +126,18 @@ def _build_context(all_txs: List[dict]) -> dict:
             r_dates[rec].append(str(t.get("date", "")))
             amounts.append(float(t.get("amount", 0)))
             transfers.append(t)
+
+    # last activity date across ALL transaction types (for dormancy check)
+    all_dates = [str(t.get("date", "")) for t in all_txs if t.get("date")]
+    last_activity_date = max(all_dates) if all_dates else None
+
     return {
         "recipient_counts": dict(r_counts),
         "recipient_dates":  dict(r_dates),
         "avg_amount":       sum(amounts) / len(amounts) if amounts else 0.0,
         "all_transfers":    transfers,
+        "all_txs":          all_txs,
+        "last_activity_date": last_activity_date,
     }
 
 
@@ -154,10 +160,6 @@ def _smurfing_check(tx: dict, all_transfers: List[dict]) -> bool:
     """
     R011 helper: detect transfers to 3+ DISTINCT recipients within a short
     (60 minute) window, which is a classic smurfing / fan-out pattern.
-    Uses the same time-window approach as _velocity_check but counts
-    distinct receivers instead of raw transfer count, so a burst of
-    payments to the SAME recipient (already covered by R002/R006) does not
-    also trip this rule.
     """
     try:
         now_str = str(tx.get("created_at") or tx.get("date", ""))
@@ -186,8 +188,7 @@ def _new_beneficiary_exposure(tx: dict, ctx: dict) -> bool:
     same definition of "new" used by R004), across DISTINCT new
     recipients. Fires only when 2+ distinct new beneficiaries are involved
     AND the cumulative amount sent to them today is significant
-    (> ₹75,000), so a single new-beneficiary transfer (however large)
-    never triggers this rule by itself — that stays R004's job.
+    (> ₹75,000).
     """
     try:
         today = str(tx.get("date", datetime.today().date()))[:10]
@@ -195,7 +196,6 @@ def _new_beneficiary_exposure(tx: dict, ctx: dict) -> bool:
         all_transfers = ctx.get("all_transfers", [])
 
         todays = [t for t in all_transfers if str(t.get("date", ""))[:10] == today]
-        # include the in-flight transaction itself
         todays = todays + [tx]
 
         new_benef_totals: Dict[str, float] = defaultdict(float)
@@ -212,9 +212,111 @@ def _new_beneficiary_exposure(tx: dict, ctx: dict) -> bool:
         return False
 
 
+def _dormant_reactivation_check(tx: dict, ctx: dict) -> bool:
+    """
+    R013: account had no activity (any transaction type) for 60+ days
+    before this transaction, and this transaction is now happening.
+    Only fires if there WAS prior history (a genuinely brand-new account
+    with zero history is not "dormant" — that's just new).
+    """
+    try:
+        last_activity = ctx.get("last_activity_date")
+        if not last_activity:
+            return False
+        tx_date_str = str(tx.get("date", datetime.today().date()))[:10]
+        last_dt = datetime.fromisoformat(last_activity[:10])
+        tx_dt   = datetime.fromisoformat(tx_date_str)
+        gap_days = (tx_dt - last_dt).days
+        return gap_days >= 60
+    except Exception:
+        return False
+
+
+def _balance_sweep_check(tx: dict, current_balance: Optional[float]) -> bool:
+    """
+    R014: transaction amount exceeds 90% of the CURRENT account balance
+    (balance as it stood before this transaction executes). Only
+    evaluated when a balance is supplied by the caller (banking.py has
+    it at pre-check time); silently skipped otherwise.
+    """
+    try:
+        if current_balance is None or current_balance <= 0:
+            return False
+        amount = float(tx.get("amount", 0))
+        return amount > 0.9 * current_balance
+    except Exception:
+        return False
+
+
+def _small_test_then_large_check(tx: dict, ctx: dict) -> bool:
+    """
+    R015: same receiver had a small "test" transfer (below ₹500) within
+    the last 60 minutes, and this current transaction to the same
+    receiver is significantly larger (>= 10x that test amount, and
+    itself above ₹10,000). Classic testing-then-cashout pattern.
+    """
+    try:
+        receiver = tx.get("receiver", "")
+        amount   = float(tx.get("amount", 0))
+        if amount < 10000:
+            return False
+
+        now_str = str(tx.get("created_at") or tx.get("date", ""))
+        all_transfers = ctx.get("all_transfers", [])
+
+        same_receiver = [t for t in all_transfers if str(t.get("receiver", "")) == receiver]
+
+        if "T" not in now_str and len(now_str) == 10:
+            candidates = [t for t in same_receiver if str(t.get("date",""))[:10] == now_str[:10]]
+        else:
+            dt_now = datetime.fromisoformat(now_str.replace("Z", "+00:00"))
+            candidates = [
+                t for t in same_receiver
+                if abs((datetime.fromisoformat(
+                    str(t.get("created_at", t.get("date",""))).replace("Z","+00:00")
+                ) - dt_now).total_seconds()) <= 3600
+            ]
+
+        for t in candidates:
+            test_amt = float(t.get("amount", 0))
+            if 0 < test_amt < 500 and amount >= test_amt * 10:
+                return True
+        return False
+    except Exception:
+        return False
+
+
+def _escalating_ladder_check(tx: dict, ctx: dict) -> bool:
+    """
+    R016: 3+ transfers today (including current), each progressively
+    larger than the previous one, none individually large enough to
+    trip R001/R008 alone in earlier steps — a classic "testing the
+    ceiling" escalation pattern.
+    """
+    try:
+        today = str(tx.get("date", datetime.today().date()))[:10]
+        all_transfers = ctx.get("all_transfers", [])
+        todays = [t for t in all_transfers if str(t.get("date",""))[:10] == today]
+        todays = todays + [tx]
+
+        # sort by created_at if present, else keep insertion order
+        def _key(t):
+            return str(t.get("created_at") or t.get("date") or "")
+        todays_sorted = sorted(todays, key=_key)
+
+        if len(todays_sorted) < 3:
+            return False
+
+        amounts = [float(t.get("amount", 0)) for t in todays_sorted[-3:]]
+        return amounts[0] < amounts[1] < amounts[2]
+    except Exception:
+        return False
+
+
 # ─── Rule engine ──────────────────────────────────────────────────────────────
 def apply_rules(tx: dict, ctx: Optional[dict] = None,
-                failed_otp_count: int = 0) -> List[dict]:
+                failed_otp_count: int = 0,
+                current_balance: Optional[float] = None) -> List[dict]:
     flags: List[dict] = []
     amount  = float(tx.get("amount", 0))
     tx_type = tx.get("type", "")
@@ -231,27 +333,42 @@ def apply_rules(tx: dict, ctx: Optional[dict] = None,
         if amount > 75000:
             add("R001")
 
-        # R008: amount > 40000 — low-severity warning signal only, never
-        # sufficient on its own to push a transaction into WARN/BLOCK.
+        # R008: amount > 40000 — low-severity warning signal only
         if amount > 40000:
             add("R008")
 
-        # R003: odd hour
-        h = datetime.now().hour
+        # R003: odd hour (based on the transaction's own timestamp)
+        h = _get_hour(tx)
         if h >= 23 or h <= 5:
             add("R003")
 
+        # R013: dormant account reactivation — applies to any money-movement type
+        if ctx and _dormant_reactivation_check(tx, ctx):
+            add("R013")
+
+        # R014: balance sweep — needs current_balance supplied by caller
+        if _balance_sweep_check(tx, current_balance):
+            add("R014")
+
         if tx_type == "transfer":
-            # R004: new recipient + amount > 50000.
-            # A brand-new beneficiary is NORMAL (user just added them before
-            # transferring) — this must only ever be a contributing medium
-            # signal, never a blocking condition by itself.
+            # R004: new recipient + amount > 50000
             if amount > 50000:
                 if ctx:
                     if ctx["recipient_counts"].get(receiver, 0) <= 1:
                         add("R004")
                 else:
                     add("R004")
+
+            # R017: high-value transfer floor. Guarantees that a ₹50,000+
+            # transfer NEVER slips through purely because the ML
+            # (Isolation Forest) anomaly score happened to be low or the
+            # model hadn't picked up an anomaly at transfer-time. This
+            # rule fires independent of ML score and independent of
+            # whether the recipient is new/repeat — it's a deterministic
+            # floor signal, not a replacement for R001/R004/R008 (which
+            # still add their own weight on top when applicable).
+            if amount >= 50000:
+                add("R017")
 
             if ctx:
                 # R002: same recipient same day >= 2
@@ -269,23 +386,27 @@ def apply_rules(tx: dict, ctx: Optional[dict] = None,
                 if avg > 0 and amount > avg * 2:
                     add("R007")
 
-                # R011: multi-recipient smurfing — 3+ distinct recipients
-                # within a short window. Medium signal only, never blocks
-                # by itself.
+                # R011: multi-recipient smurfing
                 if _smurfing_check(tx, ctx["all_transfers"]):
                     add("R011")
 
-                # R012: cumulative exposure to multiple new beneficiaries
-                # today. Medium signal only, never blocks by itself.
+                # R012: cumulative exposure to multiple new beneficiaries today
                 if _new_beneficiary_exposure(tx, ctx):
                     add("R012")
+
+                # R015: small test transfer followed by large transfer
+                if _small_test_then_large_check(tx, ctx):
+                    add("R015")
+
+                # R016: escalating transfer ladder
+                if _escalating_ladder_check(tx, ctx):
+                    add("R016")
 
     # R009: failed OTP
     if failed_otp_count >= 2:
         add("R009")
 
     return flags
-
 
 def compute_risk_score(flags: List[dict], ml_score: float = 0.0) -> int:
     rule_score = min(90, sum(f["weight"] for f in flags))
@@ -301,14 +422,20 @@ def classify_risk(score: int) -> str:
 # ─── Pre-transfer scoring ─────────────────────────────────────────────────────
 def score_pretransfer(tx: dict, historical: List[dict],
                       failed_otp_count: int = 0,
-                      user_id: Optional[int] = None) -> dict:
+                      user_id: Optional[int] = None,
+                      current_balance: Optional[float] = None) -> dict:
     """
     Uses the per-user Isolation Forest model (keyed by user_id) so each
     user's anomaly baseline is scored against their own transaction
     history rather than a single global model shared across all accounts.
+
+    current_balance (optional): the account balance BEFORE this
+    transaction executes, used only by the balance-sweep rule (R014).
+    Backward compatible — existing callers that don't pass it simply
+    skip that rule.
     """
     ctx   = _build_context(historical)
-    flags = apply_rules(tx, ctx, failed_otp_count)
+    flags = apply_rules(tx, ctx, failed_otp_count, current_balance)
 
     model = _get_or_train_model(user_id, historical)
     ml = model.score(tx)
@@ -321,16 +448,12 @@ def score_pretransfer(tx: dict, historical: List[dict],
 
     # Hard block: only when the transaction is already independently at
     # BLOCK-level risk (strong ML anomaly + multiple corroborating rule
-    # flags), AND the amount is large. A single rule (e.g. amount alone,
-    # or new-beneficiary alone) can never reach this because R001/R004/R008
-    # combined cap out well below RISK_BLOCK — genuine block requires
-    # velocity/repeat-recipient/ML-anomaly signals stacking on top.
+    # flags), AND the amount is large.
     if (tx.get("type") == "transfer"
             and float(tx.get("amount", 0)) > 75000
             and score >= RISK_BLOCK):
         score = max(score, RISK_BLOCK)
 
-    # Withdraw: NEVER block on amount
     action = classify_risk(score)
     return {
         "risk_score": score, "risk_level": action,
@@ -340,21 +463,28 @@ def score_pretransfer(tx: dict, historical: List[dict],
 
 
 # ─── Batch analysis (fraud dashboard) ────────────────────────────────────────
+# ─── Batch analysis (fraud dashboard) ────────────────────────────────────────
 def analyze_all_transactions(transactions: List[dict], user_id: Optional[int] = None) -> Dict[str, Any]:
     """
-    user_id is optional for backward compatibility with existing callers
-    that analyze a mixed/global transaction set (falls back to the shared
-    global-key model in that case). Pass user_id when analyzing a single
-    user's transactions to use their dedicated per-user model.
+    IMPORTANT: For transactions with status == "completed" or "blocked",
+    this NEVER re-derives fraud flags/score live. It always uses the
+    values that were saved at transaction-time (fraud_score, fraud_flags,
+    is_flagged). This is intentional — the Isolation Forest model is
+    retrained on every call using the latest historical data, so its
+    live score for an old transaction can drift over time even though
+    nothing about that transaction changed. Re-deriving would make the
+    same transaction show a different risk score/flags on the dashboard
+    than what the user actually saw (or didn't see) at transfer time.
     """
     model = _get_or_train_model(user_id, transactions)
-
     ctx    = _build_context(transactions)
     alerts = []
 
     for tx in transactions:
-        # Use saved fraud result for blocked transactions
-        if tx.get("status") == "blocked":
+        status = tx.get("status")
+
+        # Blocked: always shown, using saved fraud result.
+        if status == "blocked":
             alerts.append({
                 "transaction_id": tx.get("id"),
                 "type": tx.get("type"),
@@ -366,33 +496,45 @@ def analyze_all_transactions(transactions: List[dict], user_id: Optional[int] = 
                 "ml_score": 0,
                 "flags": [next((r for r in FRAUD_RULES if r["id"] == fid), {"rule_id": fid, "rule": fid, "severity": "high", "weight": 0}) for fid in (tx.get("fraud_flags") or [])],
                 "flag_ids": list(tx.get("fraud_flags") or []),
-                
                 "max_severity": "high",
                 "action": "blocked",
             })
             continue
 
-        flags = apply_rules(tx, ctx)
-        ml = model.score(tx)
-        score = compute_risk_score(flags, ml)
+        # Completed: use the SAVED result always. Only show on the
+        # dashboard if it was actually flagged at transfer-time
+        # (is_flagged True). Never re-run apply_rules()/model.score()
+        # against a completed transaction — that live-recompute is what
+        # caused a transaction to change risk score after the fact.
+        if status == "completed":
+            if not tx.get("is_flagged"):
+                continue  # normal transaction — never shown
 
-        if flags or ml > 0.55:
-            sevs    = [f["severity"] for f in flags]
+            saved_flag_ids = list(tx.get("fraud_flags") or [])
+            saved_flags = [
+                next((r for r in FRAUD_RULES if r["id"] == fid),
+                     {"rule_id": fid, "rule": fid, "severity": "medium", "weight": 0})
+                for fid in saved_flag_ids
+            ]
+            sevs = [f["severity"] for f in saved_flags]
             max_sev = "high" if "high" in sevs else ("medium" if "medium" in sevs else "low")
             alerts.append({
                 "transaction_id": tx.get("id"),
-                "type":           tx.get("type"),
-                "amount":         float(tx.get("amount", 0)),
-                "receiver":       tx.get("receiver"),
-                "sender":         tx.get("sender"),
-                "date":           str(tx.get("date")),
-                "risk_score":     score,
-                "ml_score":       round(ml, 4),
-                "flags":          flags,
-                "flag_ids": list(tx.get("fraud_flags") or []),
-                "max_severity":   max_sev,
-                "action":         classify_risk(score),
+                "type": tx.get("type"),
+                "amount": float(tx.get("amount", 0)),
+                "receiver": tx.get("receiver"),
+                "sender": tx.get("sender"),
+                "date": str(tx.get("date")),
+                "risk_score": round(tx.get("fraud_score", 0.0) * 100),
+                "ml_score": 0,
+                "flags": saved_flags,
+                "flag_ids": saved_flag_ids,
+                "max_severity": max_sev,
+                "action": "warning",
             })
+            continue
+
+        # Any other status (e.g. pending) — skip, nothing to show.
 
     alerts.sort(key=lambda x: x["date"], reverse=True)
     high    = [a for a in alerts if a["max_severity"] == "high"]

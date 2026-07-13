@@ -15,6 +15,22 @@ NOTE: Daily limit usage (check_daily_limit / _get_used_today) counts ONLY
 transactions with status == "completed". Blocked fraud transactions are
 still persisted (for audit/history) with status == "blocked" and are
 excluded from daily usage totals.
+
+Fraud flow:
+  NORMAL  -> OTP generated immediately -> completed -> counts in daily
+             limit -> not shown in fraud dashboard.
+  WARNING -> NO OTP generated yet. Response returned to client with
+             action == "warning" so it can show a Warning Modal. OTP is
+             only created after the client resubmits with
+             confirm_risk=True (user clicked "Continue"). On successful
+             OTP verification, status becomes "completed" and it DOES
+             count in the daily limit, but it also carries is_flagged /
+             fraud_score / fraud_flags so it appears in the Fraud
+             Dashboard.
+  BLOCK   -> NO OTP ever generated. No balance deduction. Transaction is
+             persisted immediately with status="blocked" (for Fraud
+             Dashboard + Transaction History) and is excluded from daily
+             limit usage.
 """
 from datetime import date as date_type
 from fastapi import APIRouter, Depends, HTTPException
@@ -423,8 +439,16 @@ async def initiate_transfer(
     failed_otps = await count_failed_attempts(db, current_user.id, "transfer")
     proposed    = {"type": "transfer", "amount": payload.amount,
                    "receiver": payload.receiver, "category": payload.category or "General"}
-    fraud       = score_pretransfer(proposed, history, failed_otps, user_id=current_user.id)
+    fraud       = score_pretransfer(
+        proposed, history, failed_otps,
+        user_id=current_user.id,
+        current_balance=float(acc.balance),
+    )
 
+    # ── BLOCK ──────────────────────────────────────────────────────────
+    # No OTP. No balance deduction. No daily limit usage. Transaction is
+    # saved immediately with status="blocked" so it appears in the Fraud
+    # Dashboard and Transaction History.
     if fraud["action"] == "blocked":
         reasons = [f["rule"] for f in fraud["flags"]]
 
@@ -463,6 +487,11 @@ async def initiate_transfer(
             },
         )
 
+    # ── WARNING ────────────────────────────────────────────────────────
+    # If the client hasn't confirmed yet (confirm_risk not set), return
+    # the warning WITHOUT generating an OTP. The client shows the Warning
+    # Modal; only when the user clicks "Continue" (client resubmits with
+    # confirm_risk=True) do we proceed past this block to OTP generation.
     if fraud["action"] == "warning" and not getattr(payload, "confirm_risk", False):
         return {
             "status": "warning",
@@ -473,6 +502,9 @@ async def initiate_transfer(
             },
         }
 
+    # ── NORMAL, or WARNING+confirmed ──────────────────────────────────
+    # Only now is an OTP ever generated — never before Continue for a
+    # warning-level transaction, and immediately for a normal one.
     session_id, _ = await create_otp_session(
         db, user_id=current_user.id, action="transfer",
         payload={
@@ -510,6 +542,12 @@ async def verify_transfer(
     fr          = data.get("fraud_result", {})
     risk_score  = fr.get("risk_score", 0)
     flag_ids    = [f["rule_id"] for f in fr.get("flags", [])]
+    # status is ALWAYS "completed" here — this endpoint only runs after a
+    # successful OTP, which for warning-level transactions only happens
+    # after the user clicked Continue. Blocked transactions never reach
+    # this endpoint (no OTP session is ever created for them). is_flagged
+    # + fraud_score/fraud_flags are what surface a completed-but-warned
+    # transaction on the Fraud Dashboard.
     tx = Transaction(
         account_id=acc.id, type="transfer", amount=data["amount"],
         sender="Self", receiver=data["receiver"], message=data.get("message"),
@@ -530,10 +568,3 @@ async def verify_transfer(
                          "body": f"₹{data['amount']:,.0f} sent to {data['receiver']}.",
                          "color": "#6366f1"},
     }
-
-
-
-
-
-
-    

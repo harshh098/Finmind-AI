@@ -28,7 +28,7 @@ async def _load_user_transactions(db: AsyncSession, user_id: int) -> list:
             "sender": t.sender, "receiver": t.receiver,
             "date": str(t.date), "category": t.category,
             "created_at": t.created_at, "status": t.status,
-            "is_flagged": t.is_flagged,"fraud_score": t.fraud_score,
+            "is_flagged": t.is_flagged, "fraud_score": t.fraud_score,
             "fraud_flags": t.fraud_flags,
         }
         for t in tx_result.scalars().all()
@@ -41,7 +41,7 @@ async def get_fraud_report(
     db: AsyncSession = Depends(get_db),
 ):
     tx_dicts = await _load_user_transactions(db, current_user.id)
-    return analyze_all_transactions(tx_dicts)
+    return analyze_all_transactions(tx_dicts, user_id=current_user.id)
 
 
 @router.get("/rules")
@@ -58,7 +58,7 @@ async def get_fraud_stats(
     db: AsyncSession = Depends(get_db),
 ):
     tx_dicts = await _load_user_transactions(db, current_user.id)
-    result   = analyze_all_transactions(tx_dicts)
+    result   = analyze_all_transactions(tx_dicts, user_id=current_user.id)
     return {
         "total_transactions": result["total_transactions"],
         "flagged_count":      result["flagged_count"],

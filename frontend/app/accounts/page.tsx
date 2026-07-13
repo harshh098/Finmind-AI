@@ -488,7 +488,7 @@ async function handleTransferInitiate(benef: Beneficiary) {
             <label className="label-sm">{t("amount")} (₹)</label>
             <input value={amount} onChange={e=>setAmount(e.target.value)} placeholder="e.g. 5000" type="number" className="input"/>
             <p className="text-xs text-slate-500 mt-1">
-              Daily deposit limit: ₹1,00,000
+              Daily deposit limit: ₹2,00,000
             </p>
           </div>
           <div>
